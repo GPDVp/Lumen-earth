@@ -585,6 +585,40 @@
             box-shadow: 0 0 8px rgba(95,139,255,0.2);
         }
 
+        /* Rubika Link Styling */
+        .rubika-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: rgba(95,139,255,0.12);
+            backdrop-filter: blur(8px);
+            padding: 0.6rem 1.4rem;
+            border-radius: 60px;
+            text-decoration: none;
+            color: inherit;
+            font-weight: 600;
+            transition: all 0.3s var(--transition-smooth);
+            border: 1px solid rgba(95,139,255,0.2);
+            margin-top: 1rem;
+        }
+        
+        .rubika-link:hover {
+            transform: translateY(-3px);
+            background: rgba(95,139,255,0.25);
+            box-shadow: 0 8px 20px rgba(95,139,255,0.3);
+            border-color: rgba(95,139,255,0.5);
+        }
+        
+        body.dark .rubika-link {
+            background: rgba(95,139,255,0.08);
+            border-color: rgba(95,139,255,0.3);
+        }
+        
+        body.dark .rubika-link:hover {
+            background: rgba(95,139,255,0.2);
+            box-shadow: 0 8px 20px rgba(95,139,255,0.4);
+        }
+
         /* CAPTCHA */
         .captcha-container {
             background: rgba(0,0,0,0.04);
@@ -684,30 +718,42 @@
         
         body.dark .toggle-auth { color: #9eb9ff; }
 
-        /* Advanced Line Chart */
-        .chart-line-container {
-            position: relative;
-            margin: 1rem 0;
+        /* Donation Panel Styles */
+        .donation-panel {
+            background: var(--card-light);
+            backdrop-filter: blur(24px);
+            border-radius: 2rem;
+            padding: 2rem;
+            max-width: 650px;
+            margin: 2rem auto;
+            transition: all 0.4s var(--transition-smooth);
+            border: 1px solid rgba(255,255,255,0.3);
         }
-        .line-chart-svg {
-            width: 100%;
-            overflow: visible;
+        body.dark .donation-panel {
+            background: var(--card-dark);
+            border-color: rgba(95,139,255,0.2);
         }
-        .chart-line {
-            stroke-width: 3;
-            fill: none;
-            transition: all 0.7s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-        }
-        .chart-area {
-            transition: opacity 0.5s ease;
-        }
-        .chart-dot {
-            transition: r 0.2s, filter 0.2s;
+        .donation-option {
+            background: rgba(95,139,255,0.08);
+            border-radius: 1.5rem;
+            padding: 1rem 1.2rem;
+            transition: all 0.3s ease;
             cursor: pointer;
+            border: 1px solid transparent;
         }
-        .chart-dot:hover {
-            r: 8;
-            filter: drop-shadow(0 0 6px rgba(95,139,255,0.8));
+        .donation-option:hover {
+            transform: translateX(6px);
+            background: rgba(95,139,255,0.15);
+            border-color: rgba(95,139,255,0.3);
+        }
+        .donation-amount {
+            background: rgba(0,0,0,0.05);
+            border-radius: 60px;
+            padding: 0.3rem 1rem;
+            font-weight: 700;
+        }
+        body.dark .donation-amount {
+            background: rgba(95,139,255,0.15);
         }
     </style>
 </head>
@@ -733,11 +779,17 @@
         <div id="pageContent"></div>
         <button id="floatingHomeBtn" class="floating-home-btn">🏠 Home</button>
         
+        <!-- Footer with Support Email & Rubika Channel Link (Updated) -->
         <footer class="site-footer">
             <div class="support-email">
                 📧 <strong>Support:</strong> Lumenearthstudio@gmail.com
             </div>
-            <div style="margin-top: 0.5rem; font-size: 0.7rem;">© 2024 Lumen Eath · All rights reserved</div>
+            <div style="margin-top: 0.8rem;">
+                <a href="https://rubika.ir/lumenearthstudio" target="_blank" rel="noopener noreferrer" class="rubika-link">
+                    <span>📱</span> Official Rubika Channel <span>➡️</span>
+                </a>
+            </div>
+            <div style="margin-top: 0.8rem; font-size: 0.7rem;">© 2024 Lumen Eath · All rights reserved</div>
         </footer>
     </div>
 
@@ -812,6 +864,7 @@
                 currentPage = page;
                 if (page === 'home') { renderHomePage(); showHomeButton(false); }
                 else if (page === 'team') { renderTeamPage(); showHomeButton(true); }
+                else if (page === 'donate') { renderDonatePage(); showHomeButton(true); }
                 else if (page === 'admin') { renderAdminGatePage(); showHomeButton(true); }
             }
             
@@ -819,8 +872,51 @@
                 contentDiv.innerHTML = `<div class="hero"><h1 class="hero-title">from shadow to radiance</h1><p class="hero-desc" style="margin-top: 1rem; opacity: 0.75;">Infinite fluid · Premium verification · Global secure system</p><div class="grid-cards"><div class="card-item"><div style="font-size: 2.5rem;">✦</div><div style="font-weight: 600; margin-top: 0.5rem;">Luminary</div></div><div class="card-item"><div style="font-size: 2.5rem;">◈</div><div style="font-weight: 600; margin-top: 0.5rem;">Noctis</div></div><div class="card-item"><div style="font-size: 2.5rem;">○</div><div style="font-weight: 600; margin-top: 0.5rem;">Aether</div></div></div></div>`;
                 document.querySelectorAll('.card-item').forEach(attachRipple);
             }
+            
             function renderTeamPage() {
                 contentDiv.innerHTML = `<div style="max-width: 800px; margin: 2rem auto; animation: heroMorph 0.6s var(--transition-smooth);"><div style="background: var(--card-light); backdrop-filter: blur(24px); border-radius: 2rem; padding: 2rem; text-align: center;"><div style="font-size: 4.5rem;">🧠</div><h1 style="font-size: 2.8rem; font-weight: 800; background: linear-gradient(135deg, #5f8bff, #aac2ff); background-clip: text; -webkit-background-clip: text; color: transparent;">Erfan</h1><p style="font-size: 1rem; opacity: 0.8; margin-bottom: 1.5rem;">Mastermind · Technical Genius</p><p style="font-size: 1.1rem; line-height: 1.6;">✨ <strong>Erfan</strong>, the technical brain of our team, possesses profound knowledge across <span style="color: #5f8bff; font-weight: 700;">four powerful programming languages</span>: <strong>C#, GDScript, Python, and Java</strong>. His extraordinary ability in software and game development pushes boundaries.</p><div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 0.8rem; margin: 1.5rem 0;"><span style="background: rgba(95,139,255,0.15); padding: 0.4rem 1.2rem; border-radius: 40px;">⚡ C#</span><span style="background: rgba(95,139,255,0.15); padding: 0.4rem 1.2rem; border-radius: 40px;">🎮 GDScript</span><span style="background: rgba(95,139,255,0.15); padding: 0.4rem 1.2rem; border-radius: 40px;">🐍 Python</span><span style="background: rgba(95,139,255,0.15); padding: 0.4rem 1.2rem; border-radius: 40px;">☕ Java</span></div></div></div>`;
+            }
+            
+            // Professional Donate Page with updated links (Daramet gateway)
+            function renderDonatePage() {
+                contentDiv.innerHTML = `
+                    <div style="animation: heroMorph 0.5s var(--transition-smooth);">
+                        <div class="donation-panel">
+                            <div style="text-align: center; margin-bottom: 1.5rem;">
+                                <div style="font-size: 3rem;">❤️</div>
+                                <h2 style="font-size: 2rem; font-weight: 800; margin-top: 0.5rem;">Support the Vision</h2>
+                                <p style="opacity: 0.7; max-width: 400px; margin: 0.5rem auto;">Your contribution fuels innovation, keeps the nexus alive and empowers future developments.</p>
+                            </div>
+                            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                                <div class="donation-option" onclick="window.open('https://daramet.com/Lumenearthstudio', '_blank')">
+                                    <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; justify-content: space-between;">
+                                        <div><span style="font-size: 1.8rem;">💳</span> <strong style="margin-left: 0.5rem;">Donate via Daramet (Iranian Gateway)</strong></div>
+                                        <div class="donation-amount">Secure Payment</div>
+                                    </div>
+                                    <p style="font-size: 0.7rem; margin-top: 0.6rem; opacity: 0.6;">Click to support via bank cards / online wallets — instant & encrypted</p>
+                                </div>
+                                <div class="donation-option" onclick="window.open('https://daramet.com/Lumenearthstudio', '_blank')">
+                                    <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; justify-content: space-between;">
+                                        <div><span style="font-size: 1.8rem;">₿</span> <strong style="margin-left: 0.5rem;">Crypto & International Support</strong></div>
+                                        <div class="donation-amount">BTC / TON / USDT</div>
+                                    </div>
+                                    <p style="font-size: 0.7rem; margin-top: 0.6rem; opacity: 0.6;">All crypto donations processed via trusted gateway (Daramet) — safe and fast.</p>
+                                </div>
+                                <div class="donation-option" onclick="window.open('https://daramet.com/Lumenearthstudio', '_blank')">
+                                    <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap; justify-content: space-between;">
+                                        <div><span style="font-size: 1.8rem;">⚡</span> <strong style="margin-left: 0.5rem;">TON / Direct Transfer</strong></div>
+                                        <div class="donation-amount">Instant Crypto</div>
+                                    </div>
+                                    <p style="font-size: 0.7rem; margin-top: 0.6rem; opacity: 0.6;">Fast & low fee — all contributions go directly to development fund.</p>
+                                </div>
+                            </div>
+                            <div style="margin-top: 2rem; text-align: center; border-top: 1px solid rgba(95,139,255,0.2); padding-top: 1.2rem;">
+                                <p style="font-size: 0.7rem;">✨ Every donation directly accelerates R&D and maintains premium infrastructure. Thank you for being a lumen.</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                document.querySelectorAll('.donation-option').forEach(btn => attachRipple(btn));
             }
             
             function renderAdminGatePage() {
@@ -829,13 +925,12 @@
                     if (document.getElementById('adminCodeInput').value.trim() === "erfan1388amir1388gamedev1388") {
                         showToast("✅ Access Granted · Welcome Admin");
                         renderAdminDashboard();
-                    } else showToast("❌ Invalid Security Code · Access Denied", true);
+                    } else showToast("❌ Invalid Security Code · Access Denied");
                 });
             }
 
             function renderAdminDashboard() {
                 let dataPoints = [120, 340, 520, 280, 590, 410, 330];
-                let intervalId = null;
                 function getColorByValue(val) {
                     if (val < 200) return "#00c853";
                     if (val < 400) return "#5f8bff";
@@ -858,11 +953,7 @@
                     document.getElementById('liveChartArea').innerHTML = chartHtml;
                     document.getElementById('currentViewsSpan').innerText = values[values.length-1];
                 }
-                function randomizeChart() {
-                    const newVals = dataPoints.map(() => Math.floor(Math.random() * 591) + 10);
-                    dataPoints = newVals;
-                    drawChart(dataPoints);
-                }
+                function randomizeChart() { dataPoints = dataPoints.map(() => Math.floor(Math.random() * 591) + 10); drawChart(dataPoints); }
                 contentDiv.innerHTML = `<div style="max-width: 950px; margin: 2rem auto; animation: heroMorph 0.6s ease-out;"><div class="admin-stats-card" style="background: var(--card-light); backdrop-filter: blur(24px); border-radius: 2.5rem; padding: 2rem;"><div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;"><h2 style="font-size: 2rem; font-weight: 800; background: linear-gradient(135deg, #5f8bff, #aac2ff); background-clip: text; -webkit-background-clip: text; color: transparent;">📊 Live Analytics · Advanced Line Chart</h2><span style="background: rgba(95,139,255,0.2); padding: 0.4rem 1.2rem; border-radius: 60px;">Real-time</span></div><p style="margin: 0.5rem 0 1rem;">Daily visits (last 7 days) · <strong id="currentViewsSpan">--</strong> views today</p><div id="liveChartArea" class="chart-line-container"></div><div id="updateTimer" style="text-align: center; margin-top: 1rem; font-size: 0.75rem; opacity: 0.7;">🔄 Refreshing in <span id="countdownSec">30</span> seconds</div></div></div>`;
                 drawChart(dataPoints);
                 let secs = 30;
@@ -871,29 +962,19 @@
                 adminInterval = setInterval(() => {
                     secs--;
                     if (timerSpan) timerSpan.innerText = secs;
-                    if (secs <= 0) {
-                        randomizeChart();
-                        secs = 30;
-                        if (timerSpan) timerSpan.innerText = "30";
-                    }
+                    if (secs <= 0) { randomizeChart(); secs = 30; if (timerSpan) timerSpan.innerText = "30"; }
                 }, 1000);
             }
             
-            // FIXED HOME BUTTON
-            homeBtn?.addEventListener('click', (e) => {
-                e.stopPropagation();
-                if (adminInterval) { clearInterval(adminInterval); adminInterval = null; }
-                navigateTo('home');
-                showToast("🏠 Returned to Nexus Home");
-            });
+            homeBtn?.addEventListener('click', (e) => { e.stopPropagation(); if (adminInterval) { clearInterval(adminInterval); adminInterval = null; } navigateTo('home'); showToast("🏠 Returned to Nexus Home"); });
             
-            // CAPTCHA Render (simplified, keeping original working)
+            // CAPTCHA simplified (keep original structure)
             let currentCaptchaSolution = null;
             function generateCaptcha() { const types = ['sum', 'click']; const chosen = types[Math.floor(Math.random() * types.length)]; if (chosen === 'sum') { const a = Math.floor(Math.random() * 15) + 2; const b = Math.floor(Math.random() * 15) + 2; currentCaptchaSolution = a + b; return { html: `<div class="captcha-puzzle"><span class="captcha-question">🔐 ${a} + ${b} = ?</span><input type="text" id="captchaInput" class="captcha-input" placeholder="Answer"><button id="captchaVerifyBtn" class="captcha-btn">Verify</button></div>`, validator: (val) => parseInt(val) === currentCaptchaSolution }; } else { currentCaptchaSolution = 'clicked'; return { html: `<div class="captcha-puzzle"><span class="captcha-question">🖱️ Click to verify</span><button id="captchaClickBtn" class="captcha-btn">I'm not a robot 👆</button></div>`, validator: (val) => val === 'clicked' }; } }
             function renderCaptcha(containerId, onSuccess) { const captchaData = generateCaptcha(); const captchaDiv = document.createElement('div'); captchaDiv.className = 'captcha-container'; captchaDiv.innerHTML = `<div style="margin-bottom: 0.3rem; font-size: 0.75rem;">🤖 <span style="font-weight: 600;">Verification</span></div>${captchaData.html}<div id="captchaStatus" style="font-size: 0.7rem; margin-top: 0.5rem; color: #f9a825;">⚠️ Please verify</div>`; const container = document.getElementById(containerId); if (container) { container.innerHTML = ''; container.appendChild(captchaDiv); } let resolved = false; const setValid = () => { if (!resolved) { resolved = true; const statusDiv = captchaDiv.querySelector('#captchaStatus'); if (statusDiv) { statusDiv.innerHTML = '✅ Verified successfully'; statusDiv.style.color = '#00c853'; } if (onSuccess) onSuccess(); } }; if (currentCaptchaSolution === 'clicked') { captchaDiv.querySelector('#captchaClickBtn')?.addEventListener('click', () => setValid()); } else if (typeof currentCaptchaSolution === 'number') { captchaDiv.querySelector('#captchaVerifyBtn')?.addEventListener('click', () => { const input = captchaDiv.querySelector('#captchaInput'); if (input && parseInt(input.value) === currentCaptchaSolution) setValid(); else { const st = captchaDiv.querySelector('#captchaStatus'); if (st) st.innerHTML = '❌ Wrong answer'; } }); } }
             
             function updateHeaderAvatar() { const img = document.getElementById('profileAvatarImg'); const placeholder = document.getElementById('avatarPlaceholder'); if (currentUser?.avatar) { img.src = currentUser.avatar; img.style.display = 'block'; placeholder.style.display = 'none'; } else { img.style.display = 'none'; placeholder.style.display = 'flex'; placeholder.textContent = currentUser?.username?.charAt(0) || '👤'; } }
-            function renderAccountSidebar() { const container = document.getElementById('accountDynamicContent'); if (!container) return; if (currentUser) { container.innerHTML = `<div style="display: flex; flex-direction: column; align-items: center; gap: 1rem;"><div id="avatarTrigger" style="width: 100px; height: 100px; border-radius: 100px; background: rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden;">${currentUser.avatar ? `<img src="${currentUser.avatar}" style="width: 100%; height: 100%; object-fit: cover;">` : `<span style="font-size: 3rem;">${currentUser.username?.charAt(0) || '👤'}</span>`}</div><input type="file" id="avatarUpload" accept="image/*" style="display: none;"><h3 style="font-weight: 700;">${currentUser.username}</h3><p style="font-size: 0.8rem; opacity: 0.8;">${currentUser.email} | ${currentUser.mobile}</p><button id="enableEditBtn" class="menu-action-btn" style="width: auto; padding: 0.5rem 1.2rem;">✎ Edit Profile</button><button id="logoutBtn" class="menu-action-btn" style="width: auto; padding: 0.5rem 1.2rem; background: rgba(224,90,90,0.2);">🚪 Logout</button><div id="editPanel" style="display: none; margin-top: 1rem; width: 100%;"><div class="input-group"><label>Username</label><input id="editUser" class="account-input" value="${currentUser.username}"></div><div class="input-group"><label>Email</label><input id="editEmail" class="account-input" value="${currentUser.email}"></div><div class="input-group"><label>Mobile</label><input id="editMobile" class="account-input" value="${currentUser.mobile}"></div><div class="input-group"><label>New Password</label><input id="editPass" type="password" class="account-input" placeholder="min 5 chars"></div><button id="saveEditBtn" class="btn-account">Save Changes</button></div></div>`; document.getElementById('avatarTrigger')?.addEventListener('click', () => document.getElementById('avatarUpload').click()); document.getElementById('avatarUpload')?.addEventListener('change', (e) => { const file = e.target.files[0]; if (file) { const reader = new FileReader(); reader.onload = (ev) => { currentUser.avatar = ev.target.result; saveCurrentUser(); renderAccountSidebar(); showToast("Avatar updated!"); }; reader.readAsDataURL(file); } }); document.getElementById('enableEditBtn')?.addEventListener('click', () => document.getElementById('editPanel').style.display = 'block'); document.getElementById('saveEditBtn')?.addEventListener('click', () => { const newUser = document.getElementById('editUser').value.trim(); const newEmail = document.getElementById('editEmail').value.trim(); const newMobile = document.getElementById('editMobile').value.trim(); const newPass = document.getElementById('editPass').value; if (!validateUsername(newUser)) { showToast("Username 3-20 chars", true); return; } if (!validateEmail(newEmail)) { showToast("Invalid email", true); return; } if (!validatePhone(newMobile)) { showToast("Invalid phone", true); return; } if (newPass && !validatePassword(newPass)) { showToast("Password: min 5 chars", true); return; } currentUser.username = newUser; currentUser.email = newEmail; currentUser.mobile = newMobile; if (newPass) currentUser.password = newPass; const idx = users.findIndex(u => u.id === currentUser.id); if (idx !== -1) users[idx] = { ...currentUser }; saveUsers(); saveCurrentUser(); showToast("Profile updated!"); renderAccountSidebar(); }); document.getElementById('logoutBtn')?.addEventListener('click', () => { currentUser = null; saveCurrentUser(); renderAccountSidebar(); closeAccountSidebar(); showToast("Logged out"); }); } else { let view = 'signin'; function renderAuth() { if (view === 'signin') { container.innerHTML = `<h3>Welcome back</h3><div class="account-form" id="signinForm"><div class="input-group"><label>Email or Mobile</label><input id="loginId" class="account-input"></div><div class="input-group"><label>Password</label><input id="loginPwd" type="password" class="account-input"></div><div id="captchaAnchorSignin"></div><button class="btn-account" id="doLogin">Sign In →</button><button class="toggle-auth" id="toSignup">✨ No account? Create</button><button class="toggle-auth" id="toRecover">🔐 Forgot password?</button></div>`; let captchaOk = false; renderCaptcha('captchaAnchorSignin', () => captchaOk = true); document.getElementById('doLogin')?.addEventListener('click', () => { if (!captchaOk) { showToast("Complete CAPTCHA first", true); return; } const id = document.getElementById('loginId').value.trim(); const pwd = document.getElementById('loginPwd').value; const user = users.find(u => (u.email === id || u.mobile === id) && u.password === pwd); if (user) { currentUser = user; saveCurrentUser(); showToast(`Welcome ${user.username}`); renderAccountSidebar(); closeAccountSidebar(); } else showToast("Invalid credentials", true); }); document.getElementById('toSignup')?.addEventListener('click', () => { view = 'signup'; renderAuth(); }); document.getElementById('toRecover')?.addEventListener('click', () => { view = 'recover'; renderAuth(); }); } else if (view === 'signup') { container.innerHTML = `<h3>Create account</h3><div class="account-form" id="signupForm"><div class="input-group"><label>Username (3-20)</label><input id="suName" class="account-input"></div><div class="input-group"><label>Mobile</label><input id="suMobile" class="account-input"></div><div class="input-group"><label>Email</label><input id="suEmail" class="account-input"></div><div class="input-group"><label>Password (min 5)</label><input id="suPwd" type="password" class="account-input"></div><div id="captchaAnchorSignup"></div><button class="btn-account" id="doSignup">Create →</button><button class="toggle-auth" id="backSignin">← Back</button></div>`; let captchaOk = false; renderCaptcha('captchaAnchorSignup', () => captchaOk = true); document.getElementById('doSignup')?.addEventListener('click', () => { if (!captchaOk) { showToast("Complete CAPTCHA", true); return; } const name = document.getElementById('suName').value.trim(); const mobile = document.getElementById('suMobile').value.trim(); const email = document.getElementById('suEmail').value.trim(); const pwd = document.getElementById('suPwd').value; if (!validateUsername(name) || !validatePhone(mobile) || !validateEmail(email) || !validatePassword(pwd)) { showToast("Invalid fields", true); return; } if (users.find(u => u.email === email) || users.find(u => u.mobile === mobile)) { showToast("Already exists", true); return; } const newUser = { username: name, mobile, email, password: pwd, id: Date.now().toString(), avatar: null }; users.push(newUser); saveUsers(); currentUser = newUser; saveCurrentUser(); showToast("Account created!"); renderAccountSidebar(); closeAccountSidebar(); }); document.getElementById('backSignin')?.addEventListener('click', () => { view = 'signin'; renderAuth(); }); } else { container.innerHTML = `<h3>Reset Password</h3><div class="account-form"><div class="input-group"><label>Email/Mobile</label><input id="recId" class="account-input"></div><div class="input-group"><label>New Password</label><input id="newPwdRec" type="password" class="account-input"></div><div id="captchaAnchorRecover"></div><button class="btn-account" id="resetPwdBtn">Reset</button><button class="toggle-auth" id="backRec">← Back</button></div>`; let captchaOk = false; renderCaptcha('captchaAnchorRecover', () => captchaOk = true); document.getElementById('resetPwdBtn')?.addEventListener('click', () => { if (!captchaOk) { showToast("CAPTCHA required", true); return; } const idf = document.getElementById('recId').value.trim(); const newP = document.getElementById('newPwdRec').value; const found = users.find(u => u.email === idf || u.mobile === idf); if (!found || !validatePassword(newP)) { showToast("Invalid", true); return; } found.password = newP; saveUsers(); showToast("Password reset!"); view = 'signin'; renderAuth(); }); document.getElementById('backRec')?.addEventListener('click', () => { view = 'signin'; renderAuth(); }); } } renderAuth(); } updateHeaderAvatar(); document.querySelectorAll('#accountDynamicContent button').forEach(attachRipple); }
+            function renderAccountSidebar() { const container = document.getElementById('accountDynamicContent'); if (!container) return; if (currentUser) { container.innerHTML = `<div style="display: flex; flex-direction: column; align-items: center; gap: 1rem;"><div id="avatarTrigger" style="width: 100px; height: 100px; border-radius: 100px; background: rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden;">${currentUser.avatar ? `<img src="${currentUser.avatar}" style="width: 100%; height: 100%; object-fit: cover;">` : `<span style="font-size: 3rem;">${currentUser.username?.charAt(0) || '👤'}</span>`}</div><input type="file" id="avatarUpload" accept="image/*" style="display: none;"><h3 style="font-weight: 700;">${currentUser.username}</h3><p style="font-size: 0.8rem; opacity: 0.8;">${currentUser.email} | ${currentUser.mobile}</p><button id="enableEditBtn" class="menu-action-btn" style="width: auto; padding: 0.5rem 1.2rem;">✎ Edit Profile</button><button id="logoutBtn" class="menu-action-btn" style="width: auto; padding: 0.5rem 1.2rem; background: rgba(224,90,90,0.2);">🚪 Logout</button><div id="editPanel" style="display: none; margin-top: 1rem; width: 100%;"><div class="input-group"><label>Username</label><input id="editUser" class="account-input" value="${currentUser.username}"></div><div class="input-group"><label>Email</label><input id="editEmail" class="account-input" value="${currentUser.email}"></div><div class="input-group"><label>Mobile</label><input id="editMobile" class="account-input" value="${currentUser.mobile}"></div><div class="input-group"><label>New Password</label><input id="editPass" type="password" class="account-input" placeholder="min 5 chars"></div><button id="saveEditBtn" class="btn-account">Save Changes</button></div></div>`; document.getElementById('avatarTrigger')?.addEventListener('click', () => document.getElementById('avatarUpload').click()); document.getElementById('avatarUpload')?.addEventListener('change', (e) => { const file = e.target.files[0]; if (file) { const reader = new FileReader(); reader.onload = (ev) => { currentUser.avatar = ev.target.result; saveCurrentUser(); renderAccountSidebar(); showToast("Avatar updated!"); }; reader.readAsDataURL(file); } }); document.getElementById('enableEditBtn')?.addEventListener('click', () => document.getElementById('editPanel').style.display = 'block'); document.getElementById('saveEditBtn')?.addEventListener('click', () => { const newUser = document.getElementById('editUser').value.trim(); const newEmail = document.getElementById('editEmail').value.trim(); const newMobile = document.getElementById('editMobile').value.trim(); const newPass = document.getElementById('editPass').value; if (!validateUsername(newUser)) { showToast("Username 3-20 chars"); return; } if (!validateEmail(newEmail)) { showToast("Invalid email"); return; } if (!validatePhone(newMobile)) { showToast("Invalid phone"); return; } if (newPass && !validatePassword(newPass)) { showToast("Password: min 5 chars"); return; } currentUser.username = newUser; currentUser.email = newEmail; currentUser.mobile = newMobile; if (newPass) currentUser.password = newPass; const idx = users.findIndex(u => u.id === currentUser.id); if (idx !== -1) users[idx] = { ...currentUser }; saveUsers(); saveCurrentUser(); showToast("Profile updated!"); renderAccountSidebar(); }); document.getElementById('logoutBtn')?.addEventListener('click', () => { currentUser = null; saveCurrentUser(); renderAccountSidebar(); closeAccountSidebar(); showToast("Logged out"); }); } else { let view = 'signin'; function renderAuth() { if (view === 'signin') { container.innerHTML = `<h3>Welcome back</h3><div class="account-form" id="signinForm"><div class="input-group"><label>Email or Mobile</label><input id="loginId" class="account-input"></div><div class="input-group"><label>Password</label><input id="loginPwd" type="password" class="account-input"></div><div id="captchaAnchorSignin"></div><button class="btn-account" id="doLogin">Sign In →</button><button class="toggle-auth" id="toSignup">✨ No account? Create</button><button class="toggle-auth" id="toRecover">🔐 Forgot password?</button></div>`; let captchaOk = false; renderCaptcha('captchaAnchorSignin', () => captchaOk = true); document.getElementById('doLogin')?.addEventListener('click', () => { if (!captchaOk) { showToast("Complete CAPTCHA first"); return; } const id = document.getElementById('loginId').value.trim(); const pwd = document.getElementById('loginPwd').value; const user = users.find(u => (u.email === id || u.mobile === id) && u.password === pwd); if (user) { currentUser = user; saveCurrentUser(); showToast(`Welcome ${user.username}`); renderAccountSidebar(); closeAccountSidebar(); } else showToast("Invalid credentials"); }); document.getElementById('toSignup')?.addEventListener('click', () => { view = 'signup'; renderAuth(); }); document.getElementById('toRecover')?.addEventListener('click', () => { view = 'recover'; renderAuth(); }); } else if (view === 'signup') { container.innerHTML = `<h3>Create account</h3><div class="account-form" id="signupForm"><div class="input-group"><label>Username (3-20)</label><input id="suName" class="account-input"></div><div class="input-group"><label>Mobile</label><input id="suMobile" class="account-input"></div><div class="input-group"><label>Email</label><input id="suEmail" class="account-input"></div><div class="input-group"><label>Password (min 5)</label><input id="suPwd" type="password" class="account-input"></div><div id="captchaAnchorSignup"></div><button class="btn-account" id="doSignup">Create →</button><button class="toggle-auth" id="backSignin">← Back</button></div>`; let captchaOk = false; renderCaptcha('captchaAnchorSignup', () => captchaOk = true); document.getElementById('doSignup')?.addEventListener('click', () => { if (!captchaOk) { showToast("Complete CAPTCHA"); return; } const name = document.getElementById('suName').value.trim(); const mobile = document.getElementById('suMobile').value.trim(); const email = document.getElementById('suEmail').value.trim(); const pwd = document.getElementById('suPwd').value; if (!validateUsername(name) || !validatePhone(mobile) || !validateEmail(email) || !validatePassword(pwd)) { showToast("Invalid fields"); return; } if (users.find(u => u.email === email) || users.find(u => u.mobile === mobile)) { showToast("Already exists"); return; } const newUser = { username: name, mobile, email, password: pwd, id: Date.now().toString(), avatar: null }; users.push(newUser); saveUsers(); currentUser = newUser; saveCurrentUser(); showToast("Account created!"); renderAccountSidebar(); closeAccountSidebar(); }); document.getElementById('backSignin')?.addEventListener('click', () => { view = 'signin'; renderAuth(); }); } else { container.innerHTML = `<h3>Reset Password</h3><div class="account-form"><div class="input-group"><label>Email/Mobile</label><input id="recId" class="account-input"></div><div class="input-group"><label>New Password</label><input id="newPwdRec" type="password" class="account-input"></div><div id="captchaAnchorRecover"></div><button class="btn-account" id="resetPwdBtn">Reset</button><button class="toggle-auth" id="backRec">← Back</button></div>`; let captchaOk = false; renderCaptcha('captchaAnchorRecover', () => captchaOk = true); document.getElementById('resetPwdBtn')?.addEventListener('click', () => { if (!captchaOk) { showToast("CAPTCHA required"); return; } const idf = document.getElementById('recId').value.trim(); const newP = document.getElementById('newPwdRec').value; const found = users.find(u => u.email === idf || u.mobile === idf); if (!found || !validatePassword(newP)) { showToast("Invalid"); return; } found.password = newP; saveUsers(); showToast("Password reset!"); view = 'signin'; renderAuth(); }); document.getElementById('backRec')?.addEventListener('click', () => { view = 'signin'; renderAuth(); }); } } renderAuth(); } updateHeaderAvatar(); document.querySelectorAll('#accountDynamicContent button').forEach(attachRipple); }
             
             const overlayMenu = document.getElementById('overlayMenu'), sidebarMenu = document.getElementById('sidebarMenu'), hamburger = document.getElementById('hamburgerBtn'), closeSidebar = document.getElementById('closeSidebarBtn');
             function closeMenu() { sidebarMenu.classList.remove('open'); overlayMenu.classList.remove('active'); hamburger.classList.remove('active'); document.body.style.overflow = ''; }
@@ -909,7 +990,7 @@
             themeBtn?.addEventListener('click', () => { body.classList.toggle('dark'); localStorage.setItem('dtl-theme', body.classList.contains('dark') ? 'dark' : 'light'); themeLabel.innerText = body.classList.contains('dark') ? 'Dark' : 'Light'; });
             document.getElementById('teamActionBtn')?.addEventListener('click', () => { closeMenu(); navigateTo('team'); });
             document.getElementById('aiActionBtn')?.addEventListener('click', () => showToast("🚀 AI Nexus · coming soon"));
-            document.getElementById('donateActionBtn')?.addEventListener('click', () => showToast("💖 Donate & Support · coming soon"));
+            document.getElementById('donateActionBtn')?.addEventListener('click', () => { closeMenu(); navigateTo('donate'); });
             document.getElementById('adminActionBtn')?.addEventListener('click', () => { closeMenu(); navigateTo('admin'); });
             document.querySelectorAll('.theme-toggle, .profile-avatar, .hamburger, .card-item, .menu-action-btn, .close-btn, .btn-account, .toggle-auth').forEach(attachRipple);
             navigateTo('home');
