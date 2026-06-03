@@ -19,19 +19,22 @@
             --bg-dark: #03050a;
             --card-light: rgba(255,255,255,0.5);
             --card-dark: rgba(10, 16, 28, 0.7);
-            --glass-light: rgba(250, 252, 255, 0.98);
-            --glass-dark: rgba(5, 8, 18, 0.98);
+            --glass-light: rgba(250, 252, 255, 0.96);
+            --glass-dark: rgba(5, 8, 18, 0.96);
             --accent: #5f8bff;
             --accent-glow: rgba(95, 139, 255, 0.4);
             --text-light: #1a253f;
             --text-dark: #f0f5ff;
-            --transition-smooth: cubic-bezier(0.2, 0.9, 0.4, 1.2);
+            --transition-smooth: cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            --success: #00c853;
+            --warning: #ff9800;
+            --error: #ff5252;
         }
 
         body {
             font-family: 'Inter', system-ui, sans-serif;
             background: var(--bg-light);
-            transition: background 0.6s var(--transition-smooth);
+            transition: background 0.5s var(--transition-smooth);
             min-height: 100vh;
             overflow-x: hidden;
             color: var(--text-light);
@@ -42,28 +45,36 @@
             color: var(--text-dark);
         }
 
+        /* Animated Orbs */
         .bg-orb {
             position: fixed;
             border-radius: 50%;
             filter: blur(100px);
             pointer-events: none;
             z-index: 0;
-            animation: floatOrb 25s infinite alternate ease-in-out;
+            animation: floatOrb 20s infinite alternate ease-in-out;
         }
+        
         @keyframes floatOrb {
-            0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
-            100% { transform: translate(50px, -40px) scale(1.15); opacity: 0.8; }
+            0% { transform: translate(0, 0) scale(1); opacity: 0.4; }
+            100% { transform: translate(40px, -30px) scale(1.1); opacity: 0.7; }
         }
-        body.dark .bg-orb { opacity: 0.3; }
+        
+        body.dark .bg-orb { opacity: 0.25; }
 
+        /* Main Container */
         .main-container {
             max-width: 1400px;
             margin: 0 auto;
             padding: 2rem 2rem 3rem;
             position: relative;
             z-index: 2;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
+        /* Header */
         .header {
             display: flex;
             justify-content: space-between;
@@ -71,15 +82,16 @@
             padding: 0.5rem 0 1rem;
             flex-wrap: wrap;
             gap: 1rem;
-            animation: slideDown 0.8s var(--transition-smooth);
+            animation: slideDown 0.6s var(--transition-smooth);
         }
+        
         @keyframes slideDown {
-            0% { opacity: 0; transform: translateY(-50px) scale(0.98); filter: blur(6px); }
-            100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+            0% { opacity: 0; transform: translateY(-30px); filter: blur(8px); }
+            100% { opacity: 1; transform: translateY(0); filter: blur(0); }
         }
 
         .logo {
-            font-size: 2.1rem;
+            font-size: 2rem;
             font-weight: 800;
             letter-spacing: -0.03em;
             background: linear-gradient(135deg, #141f33, #2d4270, #4a6ea8, #5f8bff);
@@ -88,37 +100,38 @@
             -webkit-background-clip: text;
             color: transparent;
             animation: logoShimmer 4s infinite alternate;
-            transition: all 0.3s;
         }
+        
         @keyframes logoShimmer {
-            0% { background-position: 0% 50%; filter: drop-shadow(0 0 2px rgba(95,139,255,0.3)); }
-            100% { background-position: 100% 50%; filter: drop-shadow(0 0 10px rgba(95,139,255,0.6)); }
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
         }
+        
         body.dark .logo {
             background: linear-gradient(135deg, #eef5ff, #c7ddff, #aac2ff, #eef5ff);
             background-size: 300% 300%;
             background-clip: text;
-            text-shadow: 0 0 15px rgba(167, 199, 255, 0.8);
         }
 
         .light-badge {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 600;
             padding: 0.2rem 0.8rem;
             background: rgba(0,0,0,0.05);
             border-radius: 40px;
             transition: all 0.3s;
         }
+        
         body.dark .light-badge {
             background: rgba(255,255,255,0.12);
             color: #c7ddff;
-            box-shadow: 0 0 12px rgba(95,139,255,0.8);
-            text-shadow: 0 0 5px #5f8bff;
+            box-shadow: 0 0 12px rgba(95,139,255,0.6);
         }
 
+        /* Avatar */
         .profile-avatar {
-            width: 54px;
-            height: 54px;
+            width: 52px;
+            height: 52px;
             border-radius: 60px;
             background: rgba(235, 242, 255, 0.7);
             backdrop-filter: blur(12px);
@@ -126,23 +139,20 @@
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: all 0.4s var(--transition-smooth);
+            transition: all 0.3s var(--transition-smooth);
             border: 1.5px solid rgba(255,255,255,0.6);
             overflow: hidden;
-            animation: avatarGlow 3s infinite;
         }
-        @keyframes avatarGlow {
-            0% { box-shadow: 0 0 0 0 rgba(95,139,255,0.4); }
-            70% { box-shadow: 0 0 0 8px rgba(95,139,255,0); }
-            100% { box-shadow: 0 0 0 0 rgba(95,139,255,0); }
-        }
+        
+        .profile-avatar:hover { transform: scale(1.05) rotate(2deg); }
+        
         body.dark .profile-avatar {
             background: rgba(30, 45, 80, 0.8);
-            border: 1.5px solid rgba(95,139,255,0.6);
-            box-shadow: 0 0 12px rgba(95,139,255,0.5);
+            border: 1.5px solid rgba(95,139,255,0.5);
+            box-shadow: 0 0 12px rgba(95,139,255,0.3);
         }
-        .profile-avatar:hover { transform: scale(1.08) rotate(3deg); animation: none; }
 
+        /* Theme Toggle */
         .theme-toggle {
             background: rgba(230, 238, 255, 0.7);
             backdrop-filter: blur(12px);
@@ -151,22 +161,22 @@
             border-radius: 100px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.4s var(--transition-smooth);
-            position: relative;
-            overflow: hidden;
+            transition: all 0.3s var(--transition-smooth);
             color: #1f2b44;
         }
+        
+        .theme-toggle:hover { transform: scale(1.03) translateY(-2px); box-shadow: 0 8px 20px -10px rgba(0,0,0,0.2); }
+        
         body.dark .theme-toggle {
             background: rgba(50, 70, 120, 0.8);
             color: #eef3ff;
-            box-shadow: 0 0 12px rgba(95,139,255,0.6);
-            text-shadow: 0 0 4px #5f8bff;
+            box-shadow: 0 0 10px rgba(95,139,255,0.4);
         }
-        .theme-toggle:hover { transform: scale(1.05) translateY(-3px); box-shadow: 0 12px 28px -12px rgba(0,0,0,0.3); }
 
+        /* Hamburger */
         .hamburger {
-            width: 52px;
-            height: 52px;
+            width: 50px;
+            height: 50px;
             border-radius: 30px;
             background: rgba(235, 242, 255, 0.7);
             backdrop-filter: blur(8px);
@@ -174,32 +184,39 @@
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            gap: 7px;
+            gap: 6px;
             cursor: pointer;
-            transition: all 0.4s var(--transition-smooth);
+            transition: all 0.3s var(--transition-smooth);
             border: none;
-            position: relative;
-            overflow: hidden;
         }
+        
+        .hamburger:hover { transform: scale(0.96); gap: 7px; }
+        
         body.dark .hamburger {
             background: rgba(50, 70, 120, 0.8);
-            box-shadow: 0 0 10px rgba(95,139,255,0.5);
+            box-shadow: 0 0 8px rgba(95,139,255,0.4);
         }
-        .hamburger:hover { transform: scale(0.95); gap: 8px; }
+        
         .hamburger span {
             display: block;
-            width: 28px;
+            width: 26px;
             height: 2.5px;
             background: #1f2b44;
             border-radius: 10px;
-            transition: all 0.5s cubic-bezier(0.68, -0.6, 0.32, 1.6);
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
         }
-        body.dark .hamburger span { background: #eef3ff; box-shadow: 0 0 4px #5f8bff; }
-        .hamburger.active span:nth-child(1) { transform: translateY(9.5px) rotate(45deg); }
+        
+        body.dark .hamburger span { background: #eef3ff; }
+        
+        .hamburger.active span:nth-child(1) { transform: translateY(8.5px) rotate(45deg); }
         .hamburger.active span:nth-child(2) { opacity: 0; transform: scaleX(0); }
-        .hamburger.active span:nth-child(3) { transform: translateY(-9.5px) rotate(-45deg); }
+        .hamburger.active span:nth-child(3) { transform: translateY(-8.5px) rotate(-45deg); }
 
-        .sidebar, .account-sidebar { transition: left 0.6s var(--transition-smooth), right 0.6s var(--transition-smooth); }
+        /* Sidebars */
+        .sidebar, .account-sidebar { 
+            transition: left 0.5s var(--transition-smooth), right 0.5s var(--transition-smooth); 
+        }
+        
         .sidebar {
             position: fixed;
             top: 0;
@@ -211,9 +228,15 @@
             backdrop-filter: blur(40px);
             z-index: 2000;
             padding: 2rem;
-            border-left: 1px solid rgba(255,255,255,0.5);
+            border-left: 1px solid rgba(255,255,255,0.4);
         }
-        body.dark .sidebar { background: var(--glass-dark); border-left: 1px solid rgba(80,120,200,0.3); box-shadow: -5px 0 25px rgba(95,139,255,0.2); }
+        
+        body.dark .sidebar { 
+            background: var(--glass-dark); 
+            border-left: 1px solid rgba(80,120,200,0.3); 
+            box-shadow: -5px 0 30px rgba(95,139,255,0.15);
+        }
+        
         .sidebar.open { right: 0; }
 
         .account-sidebar {
@@ -228,11 +251,18 @@
             z-index: 2100;
             padding: 2rem 1.8rem;
             overflow-y: auto;
-            border-right: 1px solid rgba(255,255,255,0.5);
+            border-right: 1px solid rgba(255,255,255,0.4);
         }
-        body.dark .account-sidebar { background: var(--glass-dark); border-right: 1px solid rgba(80,120,200,0.3); box-shadow: 5px 0 25px rgba(95,139,255,0.2); }
+        
+        body.dark .account-sidebar { 
+            background: var(--glass-dark); 
+            border-right: 1px solid rgba(80,120,200,0.3); 
+            box-shadow: 5px 0 30px rgba(95,139,255,0.15);
+        }
+        
         .account-sidebar.open { left: 0; }
 
+        /* Overlays */
         .overlay-menu, .overlay-account {
             position: fixed;
             top: 0;
@@ -242,19 +272,46 @@
             z-index: 1999;
             opacity: 0;
             visibility: hidden;
-            transition: opacity 0.5s ease, visibility 0.5s;
+            transition: opacity 0.4s ease, visibility 0.4s;
         }
-        .overlay-menu { background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(8px); }
-        .overlay-account { background: rgba(0, 0, 0, 0.35); backdrop-filter: blur(6px); z-index: 2099; }
+        
+        .overlay-menu { background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(6px); }
+        .overlay-account { background: rgba(0, 0, 0, 0.35); backdrop-filter: blur(5px); z-index: 2099; }
         .overlay-menu.active, .overlay-account.active { opacity: 1; visibility: visible; }
 
+        /* Close Button */
+        .close-btn {
+            background: rgba(0,0,0,0.08);
+            border: none;
+            width: 38px;
+            height: 38px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .close-btn:hover { background: rgba(0,0,0,0.15); transform: scale(0.95); }
+        
+        body.dark .close-btn {
+            background: rgba(255,255,255,0.1);
+            color: #eef3ff;
+        }
+        
+        body.dark .close-btn:hover { background: rgba(255,255,255,0.2); }
+
+        /* Cards */
         .grid-cards {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
             gap: 2rem;
-            margin: 4rem 0 2rem;
+            margin: 3rem 0 1rem;
         }
+        
         .card-item {
             background: var(--card-light);
             backdrop-filter: blur(12px);
@@ -262,102 +319,349 @@
             padding: 1.8rem;
             width: 210px;
             text-align: center;
-            transition: all 0.5s var(--transition-smooth);
+            transition: all 0.4s var(--transition-smooth);
             border: 1px solid rgba(255,255,255,0.3);
             cursor: pointer;
-            animation: cardReveal 0.8s backwards;
+            animation: cardReveal 0.6s backwards;
         }
-        body.dark .card-item { background: var(--card-dark); border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 8px 20px rgba(95,139,255,0.2); }
-        body.dark .card-item div { color: #eef3ff; text-shadow: 0 0 6px #5f8bff; }
-        .card-item:hover { transform: translateY(-15px) scale(1.03); box-shadow: 0 35px 45px -20px rgba(0,0,0,0.3); }
+        
+        body.dark .card-item { 
+            background: var(--card-dark); 
+            border: 1px solid rgba(255,255,255,0.1); 
+            box-shadow: 0 8px 20px rgba(95,139,255,0.15);
+        }
+        
+        .card-item:hover { transform: translateY(-10px) scale(1.02); box-shadow: 0 25px 35px -15px rgba(0,0,0,0.25); }
+        
         @keyframes cardReveal {
-            from { opacity: 0; transform: translateY(50px) scale(0.95); filter: blur(6px); }
-            to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+            from { opacity: 0; transform: translateY(40px); filter: blur(4px); }
+            to { opacity: 1; transform: translateY(0); filter: blur(0); }
         }
-        .card-item:nth-child(1) { animation-delay: 0.05s; }
-        .card-item:nth-child(2) { animation-delay: 0.15s; }
-        .card-item:nth-child(3) { animation-delay: 0.25s; }
 
+        /* Hero */
         .hero {
-            margin-top: 3.5rem;
+            margin-top: 2.5rem;
             text-align: center;
-            animation: heroMorph 1s var(--transition-smooth);
+            animation: heroMorph 0.7s var(--transition-smooth);
         }
+        
         @keyframes heroMorph {
-            0% { opacity: 0; transform: translateY(60px) scale(0.96); filter: blur(8px); }
+            0% { opacity: 0; transform: translateY(40px) scale(0.98); filter: blur(6px); }
             100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
         }
+        
         .hero-title {
-            font-size: clamp(2.5rem, 9vw, 4.8rem);
+            font-size: clamp(2.2rem, 8vw, 4.5rem);
             font-weight: 800;
             background: linear-gradient(130deg, #1f2c46, #2a4170, #3f5a8c, #5f8bff);
             background-size: 300% 300%;
             background-clip: text;
             -webkit-background-clip: text;
             color: transparent;
-            animation: gradientShift 6s infinite alternate;
+            animation: gradientShift 5s infinite alternate;
         }
+        
         @keyframes gradientShift {
             0% { background-position: 0% 50%; }
             100% { background-position: 100% 50%; }
         }
-        body.dark .hero-title {
-            background: linear-gradient(130deg, #f0f5ff, #c7ddff, #aac2ff, #eef5ff);
-            background-size: 300% 300%;
-            background-clip: text;
-            text-shadow: 0 0 20px rgba(167, 199, 255, 0.9);
-        }
-        body.dark .hero-desc {
-            color: #eef3ff;
-            text-shadow: 0 0 8px #5f8bff;
-        }
 
+        /* Form Styles */
         .account-form { display: flex; flex-direction: column; gap: 1.2rem; }
+        
         .input-group { display: flex; flex-direction: column; gap: 0.4rem; }
+        
         .input-group label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; opacity: 0.7; }
-        body.dark .input-group label { color: #c7ddff; text-shadow: 0 0 3px #5f8bff; }
+        
         .account-input {
-            background: rgba(230, 238, 255, 0.4);
+            background: rgba(230, 238, 255, 0.5);
             border: 1px solid rgba(0,0,0,0.08);
             border-radius: 28px;
-            padding: 1rem 1.3rem;
+            padding: 0.9rem 1.3rem;
             font-size: 0.95rem;
             transition: all 0.3s var(--transition-smooth);
             font-family: 'Inter', monospace;
         }
+        
         body.dark .account-input {
-            background: rgba(20, 35, 60, 0.6);
-            border: 1px solid rgba(95,139,255,0.4);
+            background: rgba(20, 35, 60, 0.7);
+            border: 1px solid rgba(95,139,255,0.3);
             color: #eef3ff;
-            box-shadow: inset 0 0 5px rgba(95,139,255,0.2);
         }
+        
         .account-input:focus {
-            transform: scale(1.02);
+            transform: scale(1.01);
             border-color: var(--accent);
-            box-shadow: 0 0 0 5px rgba(95, 139, 255, 0.25);
-            background: rgba(255,255,255,0.7);
+            box-shadow: 0 0 0 4px rgba(95, 139, 255, 0.2);
             outline: none;
         }
-        body.dark .account-input:focus { background: rgba(40, 60, 100, 0.8); box-shadow: 0 0 0 5px rgba(95,139,255,0.4); }
 
+        /* Buttons */
         .btn-account {
             background: linear-gradient(135deg, #1f2b44, #2d4270);
             border: none;
-            padding: 1rem;
+            padding: 0.9rem;
             border-radius: 60px;
             font-weight: 700;
             color: white;
             cursor: pointer;
             transition: all 0.3s var(--transition-smooth);
-            position: relative;
-            overflow: hidden;
         }
+        
         body.dark .btn-account {
             background: linear-gradient(135deg, #2a3d6e, #3f5a8c);
-            box-shadow: 0 0 12px rgba(95,139,255,0.6);
-            text-shadow: 0 0 4px white;
+            box-shadow: 0 0 10px rgba(95,139,255,0.4);
         }
-        .btn-account:hover { transform: translateY(-3px); box-shadow: 0 12px 25px -8px rgba(0,0,0,0.3); }
+        
+        .btn-account:hover { transform: translateY(-2px); box-shadow: 0 10px 20px -8px rgba(0,0,0,0.3); }
+
+        .menu-action-btn {
+            width: 100%;
+            padding: 0.9rem;
+            border-radius: 60px;
+            background: rgba(230,240,255,0.8);
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s var(--transition-smooth);
+        }
+        
+        .menu-action-btn:hover { transform: translateY(-3px); background: rgba(255,255,255,0.9); }
+        
+        body.dark .menu-action-btn { 
+            background: rgba(30,45,75,0.9); 
+            color: #eaf2ff; 
+            box-shadow: 0 0 6px rgba(95,139,255,0.3);
+        }
+        
+        body.dark .menu-action-btn:hover { background: #2a4170; box-shadow: 0 0 12px #5f8bff; }
+
+        /* Floating Home Button */
+        .floating-home-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+            background: var(--accent);
+            border: none;
+            padding: 0.8rem 1.6rem;
+            border-radius: 60px;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            transition: all 0.3s var(--transition-smooth);
+        }
+        
+        .floating-home-btn:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 10px 25px rgba(95,139,255,0.4); }
+
+        /* Loading Animation */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(12px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        
+        .loading-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .loading-card {
+            background: var(--glass-light);
+            border-radius: 2rem;
+            padding: 2rem;
+            text-align: center;
+            min-width: 300px;
+            animation: slideUp 0.4s var(--transition-smooth);
+        }
+        
+        body.dark .loading-card {
+            background: var(--glass-dark);
+        }
+        
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 3px solid rgba(95,139,255,0.2);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 1rem;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .checkmark {
+            width: 60px;
+            height: 60px;
+            margin: 0 auto 1rem;
+            animation: scaleCheck 0.4s ease-out;
+        }
+        
+        @keyframes scaleCheck {
+            from { transform: scale(0); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.5rem;
+            margin: 0.5rem 0;
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+        
+        .step-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+        
+        .step-icon.complete { background: var(--success); color: white; }
+        .step-icon.active { background: var(--accent); animation: pulse 1s infinite; }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.7; transform: scale(1.1); }
+        }
+
+        /* Footer */
+        .site-footer {
+            margin-top: auto;
+            text-align: center;
+            padding: 2rem 0 0.5rem;
+            font-size: 0.85rem;
+            opacity: 0.7;
+        }
+        
+        .support-email {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(95,139,255,0.1);
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+            font-weight: 500;
+            margin-top: 0.5rem;
+        }
+        
+        body.dark .support-email {
+            background: rgba(95,139,255,0.15);
+            box-shadow: 0 0 8px rgba(95,139,255,0.2);
+        }
+
+        /* CAPTCHA */
+        .captcha-container {
+            background: rgba(0,0,0,0.04);
+            border-radius: 1.2rem;
+            padding: 0.8rem;
+            margin: 0.5rem 0;
+        }
+        
+        body.dark .captcha-container {
+            background: rgba(95,139,255,0.08);
+            border: 1px solid rgba(95,139,255,0.2);
+        }
+        
+        .captcha-puzzle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+        
+        .captcha-question {
+            font-weight: 600;
+            font-size: 0.85rem;
+            background: rgba(95,139,255,0.15);
+            padding: 0.4rem 1rem;
+            border-radius: 40px;
+        }
+        
+        .captcha-input {
+            flex: 1;
+            background: rgba(230, 238, 255, 0.6);
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 60px;
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+        }
+        
+        .captcha-btn, .captcha-shape-btn {
+            background: var(--accent);
+            border: none;
+            border-radius: 60px;
+            padding: 0.5rem 1rem;
+            font-weight: 600;
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .captcha-shape-btn {
+            background: rgba(0,0,0,0.1);
+            color: inherit;
+        }
+        
+        body.dark .captcha-shape-btn {
+            background: rgba(95,139,255,0.2);
+            color: #eef3ff;
+        }
+
+        /* Toast */
+        .toast-msg {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(40px);
+            background: rgba(20, 30, 55, 0.95);
+            backdrop-filter: blur(24px);
+            color: white;
+            padding: 0.8rem 1.8rem;
+            border-radius: 80px;
+            font-weight: 500;
+            z-index: 3100;
+            opacity: 0;
+            transition: all 0.3s;
+            pointer-events: none;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+        
+        body.dark .toast-msg {
+            background: rgba(95,139,255,0.9);
+            color: #03050a;
+        }
+        
+        .toast-msg.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
         .toggle-auth {
             background: transparent;
             border: none;
@@ -366,119 +670,73 @@
             cursor: pointer;
             font-size: 0.8rem;
             text-decoration: underline;
-            padding: 0.5rem;
-            transition: all 0.2s;
+            padding: 0.4rem;
         }
-        .toggle-auth:hover { opacity: 0.8; transform: translateX(2px); }
-        body.dark .toggle-auth { color: #9eb9ff; text-shadow: 0 0 8px rgba(95,139,255,0.8); }
-
-        .ripple-effect {
-            position: absolute;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(255,255,245,0.9), rgba(200,220,255,0.5));
-            transform: scale(0);
-            animation: rippleDrop 0.7s var(--transition-smooth) forwards;
-            pointer-events: none;
-        }
-        @keyframes rippleDrop {
-            0% { transform: scale(0); opacity: 0.8; }
-            50% { transform: scale(1); opacity: 0.5; }
-            100% { transform: scale(3); opacity: 0; }
-        }
-        body.dark .ripple-effect {
-            background: radial-gradient(circle, rgba(180,210,255,0.9), rgba(100,150,240,0.6));
-        }
-
-        .toast-msg {
-            position: fixed;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%) translateY(30px);
-            background: rgba(20, 30, 55, 0.96);
-            backdrop-filter: blur(32px);
-            color: white;
-            padding: 1rem 2rem;
-            border-radius: 80px;
-            font-weight: 500;
-            z-index: 3100;
-            opacity: 0;
-            transition: all 0.3s var(--transition-smooth);
-            pointer-events: none;
-            font-size: 0.9rem;
-            white-space: nowrap;
-        }
-        body.dark .toast-msg {
-            background: rgba(95,139,255,0.9);
-            box-shadow: 0 0 20px #5f8bff;
-            color: #03050a;
-            font-weight: bold;
-        }
-        .toast-msg.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-        .menu-action-btn {
-            width: 100%;
-            padding: 1rem;
-            border-radius: 60px;
-            background: rgba(230,240,255,0.8);
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
-            transition: all 0.3s var(--transition-smooth);
-            position: relative;
-            overflow: hidden;
-        }
-        .menu-action-btn:hover { transform: translateY(-4px); background: rgba(255,255,255,0.9); }
-        body.dark .menu-action-btn { background: rgba(30,45,75,0.9); color: #eaf2ff; box-shadow: 0 0 8px rgba(95,139,255,0.5); }
-        body.dark .menu-action-btn:hover { background: #2a4170; box-shadow: 0 0 15px #5f8bff; }
-
-        body.dark .footer-note { color: #c7ddff; text-shadow: 0 0 5px #5f8bff; }
+        
+        body.dark .toggle-auth { color: #9eb9ff; }
     </style>
 </head>
 <body>
-    <div class="bg-orb" style="top: -20%; left: -10%; width: 600px; height: 600px; background: radial-gradient(circle, rgba(95,139,255,0.25), transparent);"></div>
-    <div class="bg-orb" style="bottom: -15%; right: -5%; width: 700px; height: 700px; background: radial-gradient(circle, rgba(140,180,250,0.2), transparent); animation-delay: -5s;"></div>
+    <div class="bg-orb" style="top: -20%; left: -10%; width: 550px; height: 550px; background: radial-gradient(circle, rgba(95,139,255,0.2), transparent);"></div>
+    <div class="bg-orb" style="bottom: -15%; right: -5%; width: 650px; height: 650px; background: radial-gradient(circle, rgba(140,180,250,0.15), transparent); animation-delay: -5s;"></div>
 
-    <div class="main-container">
+    <div class="main-container" id="mainContainer">
         <div class="header">
-            <div class="logo-area"><span class="logo">Lumen  
-            Eath
-            </span><span class="light-badge">premium nexus</span></div>
+            <div class="logo-area">
+                <span class="logo">Lumen Eath</span>
+                <span class="light-badge">premium nexus</span>
+            </div>
             <div style="display: flex; gap: 1rem; align-items: center;">
                 <div class="profile-avatar" id="profileAvatarBtn">
-                    <div class="avatar-placeholder" id="avatarPlaceholder" style="font-size:1.8rem;">👤</div>
-                    <img id="profileAvatarImg" style="display: none; width:100%; height:100%; object-fit:cover;">
+                    <div class="avatar-placeholder" id="avatarPlaceholder" style="font-size: 1.8rem;">👤</div>
+                    <img id="profileAvatarImg" style="display: none; width: 100%; height: 100%; object-fit: cover;">
                 </div>
-                <button class="theme-toggle" id="themeBtn"><span>🌓</span> <span id="themeLabel">Light</span></button>
+                <button class="theme-toggle" id="themeBtn">🌓 <span id="themeLabel">Light</span></button>
                 <button class="hamburger" id="hamburgerBtn"><span></span><span></span><span></span></button>
             </div>
         </div>
-        <div class="hero">
-            <h1 class="hero-title">from shadow to radiance</h1>
-            <p class="hero-desc" style="margin-top:1rem; opacity:0.75;">Infinite fluid · Premium verification · Global secure system</p>
-            <div class="grid-cards">
-                <div class="card-item"><div style="font-size:2.5rem;">✦</div><div style="font-weight:600; margin-top:0.5rem;">Luminary</div></div>
-                <div class="card-item"><div style="font-size:2.5rem;">◈</div><div style="font-weight:600; margin-top:0.5rem;">Noctis</div></div>
-                <div class="card-item"><div style="font-size:2.5rem;">○</div><div style="font-weight:600; margin-top:0.5rem;">Aether</div></div>
+        <div id="pageContent"></div>
+        <button id="floatingHomeBtn" class="floating-home-btn" style="display: none;">🏠 Home</button>
+        
+        <!-- Footer with Support Email -->
+        <footer class="site-footer">
+            <div class="support-email">
+                📧 <strong>Support:</strong> Lumenearthstudio@gmail.com
             </div>
-        </div>
-        <div class="footer-note" style="text-align:center; opacity:0.5; margin-top:2rem;">Dark ↔ Light · Radiant Text · Advanced Ripple Ecosystem</div>
+            <div style="margin-top: 0.5rem; font-size: 0.7rem;">© 2024 Lumen Eath · All rights reserved</div>
+        </footer>
     </div>
 
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-card">
+            <div id="loadingSpinner" class="spinner"></div>
+            <div id="loadingCheckmark" class="checkmark" style="display: none;">✅</div>
+            <h3 id="loadingTitle">Creating Account</h3>
+            <div id="loadingSteps"></div>
+        </div>
+    </div>
+
+    <!-- Sidebars -->
     <div class="overlay-menu" id="overlayMenu"></div>
     <div class="sidebar" id="sidebarMenu">
-        <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2rem;">
-            <div style="text-align:center;"><div style="font-size:3rem;">✨</div><div style="font-weight:600;">Portal</div><div style="font-size:0.7rem;">AI & Donation Hub</div></div>
+        <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2rem;">
+            <div style="text-align: center;">
+                <div style="font-size: 3rem;">✨</div>
+                <div style="font-weight: 600;">Portal</div>
+            </div>
+            <button class="menu-action-btn" id="teamActionBtn">👥 Our Team</button>
             <button class="menu-action-btn" id="aiActionBtn">🤖 AI · Intelligence</button>
             <button class="menu-action-btn" id="donateActionBtn">❤️ Donate & Support</button>
-            <button id="closeSidebarBtn" style="background:rgba(0,0,0,0.05); border:none; padding:0.6rem 1.2rem; border-radius:40px; cursor:pointer;">✕ Close</button>
+            <button id="closeSidebarBtn" class="close-btn" style="width: auto; padding: 0.6rem 1.5rem;">✕ Close</button>
         </div>
     </div>
 
     <div class="overlay-account" id="overlayAccount"></div>
     <div class="account-sidebar" id="accountSidebar">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem;">
-            <span style="font-weight:800; font-size:1.4rem;">🌟 Nexus Account</span>
-            <button id="closeAccountSidebar" style="background:rgba(0,0,0,0.05); border:none; width:38px; height:38px; border-radius:40px; cursor:pointer;">✕</button>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.8rem;">
+            <span style="font-weight: 800; font-size: 1.3rem;">🌟 Nexus Account</span>
+            <button id="closeAccountSidebar" class="close-btn">✕</button>
         </div>
         <div id="accountDynamicContent"></div>
     </div>
@@ -486,7 +744,8 @@
     <div id="toastMessage" class="toast-msg">✨ Premium system ready</div>
 
     <script>
-        (function(){
+        (function() {
+            // Ripple Effect
             function addRipple(e, el) {
                 const rect = el.getBoundingClientRect();
                 const size = Math.max(rect.width, rect.height);
@@ -500,59 +759,279 @@
                 ripple.style.width = `${size}px`;
                 ripple.style.height = `${size}px`;
                 el.style.position = 'relative';
+                el.style.overflow = 'hidden';
                 el.appendChild(ripple);
-                setTimeout(() => ripple.remove(), 700);
+                setTimeout(() => ripple.remove(), 600);
             }
-            function attachRipple(el) { if(el && !el._rippled) { el.addEventListener('click', (e) => addRipple(e, el)); el._rippled = true; } }
+            
+            function attachRipple(el) {
+                if (el && !el.dataset.rippled) {
+                    el.addEventListener('click', (e) => addRipple(e, el));
+                    el.dataset.rippled = 'true';
+                }
+            }
 
+            // Loading Animation
+            function showLoadingAnimation(onComplete) {
+                const overlay = document.getElementById('loadingOverlay');
+                const spinner = document.getElementById('loadingSpinner');
+                const checkmark = document.getElementById('loadingCheckmark');
+                const loadingTitle = document.getElementById('loadingTitle');
+                const stepsContainer = document.getElementById('loadingSteps');
+                
+                const steps = [
+                    { text: "Checking availability...", completed: false },
+                    { text: "Encrypting credentials...", completed: false },
+                    { text: "Creating secure profile...", completed: false },
+                    { text: "Finalizing account...", completed: false }
+                ];
+                
+                stepsContainer.innerHTML = steps.map((step, i) => `
+                    <div class="step-item" id="step-${i}">
+                        <div class="step-icon" id="step-icon-${i}">○</div>
+                        <span id="step-text-${i}">${step.text}</span>
+                    </div>
+                `).join('');
+                
+                overlay.classList.add('active');
+                spinner.style.display = 'block';
+                checkmark.style.display = 'none';
+                loadingTitle.textContent = "Creating Account";
+                
+                let currentStep = 0;
+                
+                function completeStep(index) {
+                    const icon = document.getElementById(`step-icon-${index}`);
+                    const textSpan = document.getElementById(`step-text-${index}`);
+                    if (icon) {
+                        icon.innerHTML = '✓';
+                        icon.classList.add('complete');
+                    }
+                    steps[index].completed = true;
+                    
+                    if (index === steps.length - 1) {
+                        setTimeout(() => {
+                            spinner.style.display = 'none';
+                            checkmark.style.display = 'block';
+                            loadingTitle.textContent = "Account Created!";
+                            setTimeout(() => {
+                                overlay.classList.remove('active');
+                                if (onComplete) onComplete();
+                            }, 800);
+                        }, 500);
+                    } else {
+                        setTimeout(() => {
+                            currentStep++;
+                            const nextIcon = document.getElementById(`step-icon-${currentStep}`);
+                            if (nextIcon) {
+                                nextIcon.innerHTML = '●';
+                                nextIcon.classList.add('active');
+                            }
+                            completeStep(currentStep);
+                        }, 600);
+                    }
+                }
+                
+                const firstIcon = document.getElementById('step-icon-0');
+                if (firstIcon) {
+                    firstIcon.innerHTML = '●';
+                    firstIcon.classList.add('active');
+                }
+                completeStep(0);
+            }
+
+            // User Management
             let users = JSON.parse(localStorage.getItem('dtl_users')) || [];
             let currentUser = JSON.parse(localStorage.getItem('dtl_currentUser')) || null;
+            
             function saveUsers() { localStorage.setItem('dtl_users', JSON.stringify(users)); }
             function saveCurrentUser() { localStorage.setItem('dtl_currentUser', JSON.stringify(currentUser)); }
-
             function validateEmail(email) { return /^[^\s@]+@[^\s@]+\.(com|org|net|io|co)$/i.test(email); }
-            function validatePhone(phone) { 
-                return /^(\+1[0-9]{10}|\+44[0-9]{10}|\+81[0-9]{10}|\+98[0-9]{10}|[0-9]{10,13})$/.test(phone) || /^[0-9]{10,13}$/.test(phone);
-            }
+            function validatePhone(phone) { return /^(\+1[0-9]{10}|\+44[0-9]{10}|\+81[0-9]{10}|\+98[0-9]{10}|[0-9]{10,13})$/.test(phone) || /^[0-9]{10,13}$/.test(phone); }
             function validatePassword(pwd) { return /^[A-Za-z0-9]{5,}$/.test(pwd); }
             function validateUsername(name) { return name.length >= 3 && name.length <= 20; }
-
-            function showToast(msg, isErr=false) {
-                const toast = document.getElementById('toastMessage');
-                toast.textContent = msg;
-                toast.classList.add('show');
-                if(window.toastTimeout) clearTimeout(window.toastTimeout);
-                window.toastTimeout = setTimeout(() => toast.classList.remove('show'), 2500);
+            function showToast(msg, isErr = false) { 
+                const toast = document.getElementById('toastMessage'); 
+                toast.textContent = msg; 
+                toast.classList.add('show'); 
+                if (window.toastTimeout) clearTimeout(window.toastTimeout); 
+                window.toastTimeout = setTimeout(() => toast.classList.remove('show'), 2500); 
+            }
+            
+            // Navigation
+            let currentPage = 'home';
+            const contentDiv = document.getElementById('pageContent');
+            const homeBtn = document.getElementById('floatingHomeBtn');
+            
+            function showHomeButton(show) {
+                homeBtn.style.display = show ? 'flex' : 'none';
+            }
+            
+            function navigateTo(page) {
+                currentPage = page;
+                if (page === 'home') {
+                    renderHomePage();
+                    showHomeButton(false);
+                } else if (page === 'team') {
+                    renderTeamPage();
+                    showHomeButton(true);
+                }
+            }
+            
+            function renderHomePage() {
+                contentDiv.innerHTML = `
+                    <div class="hero">
+                        <h1 class="hero-title">from shadow to radiance</h1>
+                        <p class="hero-desc" style="margin-top: 1rem; opacity: 0.75;">Infinite fluid · Premium verification · Global secure system</p>
+                        <div class="grid-cards">
+                            <div class="card-item"><div style="font-size: 2.5rem;">✦</div><div style="font-weight: 600; margin-top: 0.5rem;">Luminary</div></div>
+                            <div class="card-item"><div style="font-size: 2.5rem;">◈</div><div style="font-weight: 600; margin-top: 0.5rem;">Noctis</div></div>
+                            <div class="card-item"><div style="font-size: 2.5rem;">○</div><div style="font-weight: 600; margin-top: 0.5rem;">Aether</div></div>
+                        </div>
+                    </div>
+                `;
+                document.querySelectorAll('.card-item').forEach(attachRipple);
+            }
+            
+            function renderTeamPage() {
+                contentDiv.innerHTML = `
+                    <div style="max-width: 800px; margin: 2rem auto; animation: heroMorph 0.6s var(--transition-smooth);">
+                        <div style="background: var(--card-light); backdrop-filter: blur(24px); border-radius: 2rem; padding: 2rem; text-align: center;">
+                            <div style="font-size: 4.5rem;">🧠</div>
+                            <h1 style="font-size: 2.8rem; font-weight: 800; background: linear-gradient(135deg, #5f8bff, #aac2ff); background-clip: text; -webkit-background-clip: text; color: transparent;">Arfan</h1>
+                            <p style="font-size: 1rem; opacity: 0.8; margin-bottom: 1.5rem;">Mastermind · Technical Genius</p>
+                            <p style="font-size: 1.1rem; line-height: 1.6;">✨ <strong>Arfan</strong>, the technical brain of our team, possesses profound knowledge across <span style="color: #5f8bff; font-weight: 700;">four powerful programming languages</span>: <strong>C#, GDScript, Python, and Java</strong>. His extraordinary ability in software and game development pushes boundaries.</p>
+                            <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 0.8rem; margin: 1.5rem 0;">
+                                <span style="background: rgba(95,139,255,0.15); padding: 0.4rem 1.2rem; border-radius: 40px;">⚡ C#</span>
+                                <span style="background: rgba(95,139,255,0.15); padding: 0.4rem 1.2rem; border-radius: 40px;">🎮 GDScript</span>
+                                <span style="background: rgba(95,139,255,0.15); padding: 0.4rem 1.2rem; border-radius: 40px;">🐍 Python</span>
+                                <span style="background: rgba(95,139,255,0.15); padding: 0.4rem 1.2rem; border-radius: 40px;">☕ Java</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            homeBtn?.addEventListener('click', (e) => { addRipple(e, homeBtn); navigateTo('home'); });
+            
+            // CAPTCHA System
+            let currentCaptchaSolution = null;
+            
+            function generateCaptcha() {
+                const types = ['sum', 'click', 'shape', 'slider'];
+                const chosen = types[Math.floor(Math.random() * types.length)];
+                
+                if (chosen === 'sum') {
+                    const a = Math.floor(Math.random() * 15) + 2;
+                    const b = Math.floor(Math.random() * 15) + 2;
+                    currentCaptchaSolution = a + b;
+                    return { html: `<div class="captcha-puzzle"><span class="captcha-question">🔐 ${a} + ${b} = ?</span><input type="text" id="captchaInput" class="captcha-input" placeholder="Answer"><button id="captchaVerifyBtn" class="captcha-btn">Verify</button></div>`, validator: (val) => parseInt(val) === currentCaptchaSolution };
+                }
+                else if (chosen === 'click') {
+                    currentCaptchaSolution = 'clicked';
+                    return { html: `<div class="captcha-puzzle"><span class="captcha-question">🖱️ Click to verify</span><button id="captchaClickBtn" class="captcha-btn">I'm not a robot 👆</button></div>`, validator: (val) => val === 'clicked' };
+                }
+                else if (chosen === 'shape') {
+                    const shapes = ['◻️ Square', '🔴 Circle', '▲ Triangle'];
+                    const correct = shapes[Math.floor(Math.random() * 3)];
+                    currentCaptchaSolution = correct;
+                    return { html: `<div class="captcha-puzzle"><span class="captcha-question">Select: <strong>${correct}</strong></span><div style="display: flex; gap: 0.6rem;">${shapes.map(s => `<button type="button" data-shape="${s}" class="captcha-shape-btn">${s}</button>`).join('')}</div></div>`, validator: (val) => val === correct };
+                }
+                else {
+                    currentCaptchaSolution = 'slider';
+                    return { html: `<div class="captcha-puzzle"><span class="captcha-question">🎚️ Slide to 100%</span><input type="range" id="captchaSlider" min="0" max="100" value="0" style="width: 100%;"><div id="sliderHint" style="font-size: 0.7rem;">Move slider to the end →</div></div>`, validator: (val) => val === 'slider' };
+                }
+            }
+            
+            function renderCaptcha(containerId, onSuccess) {
+                const captchaData = generateCaptcha();
+                const captchaDiv = document.createElement('div');
+                captchaDiv.className = 'captcha-container';
+                captchaDiv.innerHTML = `<div style="margin-bottom: 0.3rem; font-size: 0.75rem;">🤖 <span style="font-weight: 600;">Verification</span></div>${captchaData.html}<div id="captchaStatus" style="font-size: 0.7rem; margin-top: 0.5rem; color: #f9a825;">⚠️ Please verify</div>`;
+                
+                const container = document.getElementById(containerId);
+                if (container) {
+                    container.innerHTML = '';
+                    container.appendChild(captchaDiv);
+                }
+                
+                let resolved = false;
+                const setValid = () => {
+                    if (!resolved) {
+                        resolved = true;
+                        const statusDiv = captchaDiv.querySelector('#captchaStatus');
+                        if (statusDiv) { statusDiv.innerHTML = '✅ Verified successfully'; statusDiv.style.color = '#00c853'; }
+                        if (onSuccess) onSuccess();
+                    }
+                };
+                
+                if (currentCaptchaSolution === 'clicked') {
+                    captchaDiv.querySelector('#captchaClickBtn')?.addEventListener('click', () => setValid());
+                } 
+                else if (currentCaptchaSolution === 'slider') {
+                    const slider = captchaDiv.querySelector('#captchaSlider');
+                    if (slider) slider.addEventListener('input', (e) => { if (parseInt(e.target.value) === 100) setValid(); });
+                } 
+                else if (typeof currentCaptchaSolution === 'number') {
+                    captchaDiv.querySelector('#captchaVerifyBtn')?.addEventListener('click', () => {
+                        const input = captchaDiv.querySelector('#captchaInput');
+                        if (input && parseInt(input.value) === currentCaptchaSolution) setValid();
+                        else { const st = captchaDiv.querySelector('#captchaStatus'); if (st) st.innerHTML = '❌ Wrong answer'; }
+                    });
+                } 
+                else {
+                    captchaDiv.querySelectorAll('.captcha-shape-btn').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            if (btn.getAttribute('data-shape') === currentCaptchaSolution) setValid();
+                            else { const st = captchaDiv.querySelector('#captchaStatus'); if (st) st.innerHTML = '❌ Incorrect shape'; }
+                        });
+                    });
+                }
             }
 
+            function updateHeaderAvatar() {
+                const img = document.getElementById('profileAvatarImg');
+                const placeholder = document.getElementById('avatarPlaceholder');
+                if (currentUser?.avatar) { 
+                    img.src = currentUser.avatar; 
+                    img.style.display = 'block'; 
+                    placeholder.style.display = 'none'; 
+                } else { 
+                    img.style.display = 'none'; 
+                    placeholder.style.display = 'flex'; 
+                    placeholder.textContent = currentUser?.username?.charAt(0) || '👤'; 
+                }
+            }
+            
             function renderAccountSidebar() {
                 const container = document.getElementById('accountDynamicContent');
-                if(!container) return;
+                if (!container) return;
                 
-                if(currentUser) {
+                if (currentUser) {
                     container.innerHTML = `
-                        <div style="display:flex; flex-direction:column; align-items:center; gap:1.2rem;">
-                            <div id="avatarTrigger" style="width:110px; height:110px; border-radius:100px; background:rgba(0,0,0,0.08); display:flex; align-items:center; justify-content:center; cursor:pointer; overflow:hidden; transition:0.2s;">
-                                ${currentUser.avatar ? `<img src="${currentUser.avatar}" style="width:100%;height:100%;object-fit:cover;">` : `<span style="font-size:3.5rem;">${currentUser.username?.charAt(0) || '👤'}</span>`}
+                        <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+                            <div id="avatarTrigger" style="width: 100px; height: 100px; border-radius: 100px; background: rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden;">
+                                ${currentUser.avatar ? `<img src="${currentUser.avatar}" style="width: 100%; height: 100%; object-fit: cover;">` : `<span style="font-size: 3rem;">${currentUser.username?.charAt(0) || '👤'}</span>`}
                             </div>
-                            <input type="file" id="avatarUpload" accept="image/*" style="display:none">
-                            <h3 style="font-weight:800; font-size:1.4rem;">${currentUser.username}</h3>
-                            <p style="font-size:0.85rem; opacity:0.8;">${currentUser.email} | ${currentUser.mobile}</p>
-                            <button id="enableEditBtn" style="padding:0.5rem 1.2rem; border-radius:40px; background:rgba(0,0,0,0.05); border:none; cursor:pointer;">✎ Edit Profile</button>
-                            <button id="logoutBtn" style="padding:0.5rem 1.2rem; border-radius:40px; background:#e05a5a20; border:none; cursor:pointer;">🚪 Logout</button>
-                        </div>
-                        <div id="editPanel" style="display:none; margin-top:1.8rem;">
-                            <div class="input-group"><label>Username</label><input id="editUser" class="account-input" value="${currentUser.username}"></div>
-                            <div class="input-group"><label>Email</label><input id="editEmail" class="account-input" value="${currentUser.email}"></div>
-                            <div class="input-group"><label>Mobile</label><input id="editMobile" class="account-input" value="${currentUser.mobile}"></div>
-                            <div class="input-group"><label>New Password</label><input id="editPass" type="password" class="account-input" placeholder="min 5 chars letters/numbers"></div>
-                            <button class="btn-account" id="saveEditBtn">Save Changes</button>
+                            <input type="file" id="avatarUpload" accept="image/*" style="display: none;">
+                            <h3 style="font-weight: 700;">${currentUser.username}</h3>
+                            <p style="font-size: 0.8rem; opacity: 0.8;">${currentUser.email} | ${currentUser.mobile}</p>
+                            <button id="enableEditBtn" class="menu-action-btn" style="width: auto; padding: 0.5rem 1.2rem;">✎ Edit Profile</button>
+                            <button id="logoutBtn" class="menu-action-btn" style="width: auto; padding: 0.5rem 1.2rem; background: rgba(224,90,90,0.2);">🚪 Logout</button>
+                            <div id="editPanel" style="display: none; margin-top: 1rem; width: 100%;">
+                                <div class="input-group"><label>Username</label><input id="editUser" class="account-input" value="${currentUser.username}"></div>
+                                <div class="input-group"><label>Email</label><input id="editEmail" class="account-input" value="${currentUser.email}"></div>
+                                <div class="input-group"><label>Mobile</label><input id="editMobile" class="account-input" value="${currentUser.mobile}"></div>
+                                <div class="input-group"><label>New Password</label><input id="editPass" type="password" class="account-input" placeholder="min 5 chars"></div>
+                                <button id="saveEditBtn" class="btn-account">Save Changes</button>
+                            </div>
                         </div>
                     `;
+                    
                     document.getElementById('avatarTrigger')?.addEventListener('click', () => document.getElementById('avatarUpload').click());
                     document.getElementById('avatarUpload')?.addEventListener('change', (e) => {
                         const file = e.target.files[0];
-                        if(file) { const reader = new FileReader(); reader.onload = (ev) => { currentUser.avatar = ev.target.result; saveCurrentUser(); renderAccountSidebar(); showToast("Avatar updated!"); }; reader.readAsDataURL(file); }
+                        if (file) { const reader = new FileReader(); reader.onload = (ev) => { currentUser.avatar = ev.target.result; saveCurrentUser(); renderAccountSidebar(); showToast("Avatar updated!"); }; reader.readAsDataURL(file); }
                     });
                     document.getElementById('enableEditBtn')?.addEventListener('click', () => document.getElementById('editPanel').style.display = 'block');
                     document.getElementById('saveEditBtn')?.addEventListener('click', () => {
@@ -560,116 +1039,137 @@
                         const newEmail = document.getElementById('editEmail').value.trim();
                         const newMobile = document.getElementById('editMobile').value.trim();
                         const newPass = document.getElementById('editPass').value;
-                        if(!validateUsername(newUser)) { showToast("Username 3-20 chars", true); return; }
-                        if(!validateEmail(newEmail)) { showToast("Invalid email (must contain @ and .com)", true); return; }
-                        if(!validatePhone(newMobile)) { showToast("Invalid phone number", true); return; }
-                        if(newPass && !validatePassword(newPass)) { showToast("Password: min 5 chars, letters/numbers only", true); return; }
+                        if (!validateUsername(newUser)) { showToast("Username 3-20 chars", true); return; }
+                        if (!validateEmail(newEmail)) { showToast("Invalid email", true); return; }
+                        if (!validatePhone(newMobile)) { showToast("Invalid phone", true); return; }
+                        if (newPass && !validatePassword(newPass)) { showToast("Password: min 5 chars", true); return; }
                         currentUser.username = newUser; currentUser.email = newEmail; currentUser.mobile = newMobile;
-                        if(newPass) currentUser.password = newPass;
+                        if (newPass) currentUser.password = newPass;
                         const idx = users.findIndex(u => u.id === currentUser.id);
-                        if(idx !== -1) users[idx] = {...currentUser};
+                        if (idx !== -1) users[idx] = { ...currentUser };
                         saveUsers(); saveCurrentUser();
                         showToast("Profile updated!"); renderAccountSidebar();
                     });
                     document.getElementById('logoutBtn')?.addEventListener('click', () => { currentUser = null; saveCurrentUser(); renderAccountSidebar(); closeAccountSidebar(); showToast("Logged out"); });
                 } else {
                     let view = 'signin';
-                    
                     function renderAuth() {
-                        if(view === 'signin') {
-                            container.innerHTML = `<h3 style="margin-bottom:1rem;">Welcome back</h3><div class="account-form"><div class="input-group"><label>Email or Mobile</label><input id="loginId" class="account-input" placeholder="email@example.com or +1234567890"></div><div class="input-group"><label>Password</label><input id="loginPwd" type="password" class="account-input"></div><button class="btn-account" id="doLogin">Sign In →</button><button class="toggle-auth" id="toSignup">✨ No account? Create</button><button class="toggle-auth" id="toRecover">🔐 Forgot password?</button></div>`;
+                        if (view === 'signin') {
+                            container.innerHTML = `<h3>Welcome back</h3><div class="account-form" id="signinForm"><div class="input-group"><label>Email or Mobile</label><input id="loginId" class="account-input"></div><div class="input-group"><label>Password</label><input id="loginPwd" type="password" class="account-input"></div><div id="captchaAnchorSignin"></div><button class="btn-account" id="doLogin">Sign In →</button><button class="toggle-auth" id="toSignup">✨ No account? Create</button><button class="toggle-auth" id="toRecover">🔐 Forgot password?</button></div>`;
+                            let captchaOk = false;
+                            renderCaptcha('captchaAnchorSignin', () => captchaOk = true);
                             document.getElementById('doLogin')?.addEventListener('click', () => {
+                                if (!captchaOk) { showToast("Complete CAPTCHA first", true); return; }
                                 const id = document.getElementById('loginId').value.trim();
                                 const pwd = document.getElementById('loginPwd').value;
                                 const user = users.find(u => (u.email === id || u.mobile === id) && u.password === pwd);
-                                if(user) { currentUser = user; saveCurrentUser(); showToast(`Welcome ${user.username}`); renderAccountSidebar(); closeAccountSidebar(); }
+                                if (user) { currentUser = user; saveCurrentUser(); showToast(`Welcome ${user.username}`); renderAccountSidebar(); closeAccountSidebar(); }
                                 else showToast("Invalid credentials", true);
                             });
                             document.getElementById('toSignup')?.addEventListener('click', () => { view = 'signup'; renderAuth(); });
                             document.getElementById('toRecover')?.addEventListener('click', () => { view = 'recover'; renderAuth(); });
                         } 
-                        else if(view === 'signup') {
-                            container.innerHTML = `<h3>Create account</h3><div class="account-form"><div class="input-group"><label>Username (3-20 chars)</label><input id="suName" class="account-input"></div><div class="input-group"><label>Mobile (International)</label><input id="suMobile" class="account-input" placeholder="+19876543210 or 09123456789"></div><div class="input-group"><label>Email (must contain @ and .com)</label><input id="suEmail" class="account-input" type="email"></div><div class="input-group"><label>Password (min 5, letters/numbers)</label><input id="suPwd" type="password" class="account-input"></div><button class="btn-account" id="doSignup">Create Account →</button><button class="toggle-auth" id="backSignin">← Back to Sign in</button></div>`;
+                        else if (view === 'signup') {
+                            container.innerHTML = `<h3>Create account</h3><div class="account-form" id="signupForm"><div class="input-group"><label>Username (3-20)</label><input id="suName" class="account-input"></div><div class="input-group"><label>Mobile</label><input id="suMobile" class="account-input" placeholder="+1234567890"></div><div class="input-group"><label>Email</label><input id="suEmail" class="account-input"></div><div class="input-group"><label>Password (min 5)</label><input id="suPwd" type="password" class="account-input"></div><div id="captchaAnchorSignup"></div><button class="btn-account" id="doSignup">Create Account →</button><button class="toggle-auth" id="backSignin">← Back</button></div>`;
+                            let captchaOk = false;
+                            renderCaptcha('captchaAnchorSignup', () => captchaOk = true);
                             document.getElementById('doSignup')?.addEventListener('click', () => {
+                                if (!captchaOk) { showToast("Complete CAPTCHA", true); return; }
                                 const name = document.getElementById('suName').value.trim();
                                 const mobile = document.getElementById('suMobile').value.trim();
                                 const email = document.getElementById('suEmail').value.trim();
                                 const pwd = document.getElementById('suPwd').value;
-                                if(!validateUsername(name)) { showToast("Username 3-20 characters", true); return; }
-                                if(!validatePhone(mobile)) { showToast("Invalid phone number", true); return; }
-                                if(!validateEmail(email)) { showToast("Email must contain @ and .com", true); return; }
-                                if(!validatePassword(pwd)) { showToast("Password: min 5 chars, only letters & numbers", true); return; }
-                                if(users.find(u => u.email === email || u.mobile === mobile)) { showToast("User already exists", true); return; }
-                                const newUser = { username: name, mobile, email, password: pwd, id: Date.now().toString(), avatar: null };
-                                users.push(newUser); saveUsers(); currentUser = newUser; saveCurrentUser();
-                                showToast("Account created successfully!"); renderAccountSidebar(); closeAccountSidebar();
+                                
+                                if (!validateUsername(name)) { showToast("Username 3-20 chars", true); return; }
+                                if (!validatePhone(mobile)) { showToast("Invalid phone number", true); return; }
+                                if (!validateEmail(email)) { showToast("Invalid email format (must contain @ and .com)", true); return; }
+                                if (!validatePassword(pwd)) { showToast("Password: min 5 chars, letters & numbers only", true); return; }
+                                
+                                // Check if user exists
+                                if (users.find(u => u.email === email)) { showToast("Email already registered", true); return; }
+                                if (users.find(u => u.mobile === mobile)) { showToast("Phone number already registered", true); return; }
+                                
+                                // Show loading animation then create account
+                                showLoadingAnimation(() => {
+                                    const newUser = { username: name, mobile, email, password: pwd, id: Date.now().toString(), avatar: null };
+                                    users.push(newUser); 
+                                    saveUsers(); 
+                                    currentUser = newUser; 
+                                    saveCurrentUser();
+                                    showToast("Account created successfully!");
+                                    renderAccountSidebar(); 
+                                    closeAccountSidebar();
+                                });
                             });
                             document.getElementById('backSignin')?.addEventListener('click', () => { view = 'signin'; renderAuth(); });
-                        }
-                        else if(view === 'recover') {
-                            container.innerHTML = `<h3>Reset Password</h3><div class="account-form"><div class="input-group"><label>Email or Mobile</label><input id="recId" class="account-input" placeholder="Enter your email or mobile"></div><div class="input-group"><label>New Password (min 5 letters/numbers)</label><input id="newPwdRec" type="password" class="account-input"></div><button class="btn-account" id="resetPwdBtn">Reset Password →</button><button class="toggle-auth" id="backRec">← Back to Sign in</button></div>`;
+                        } 
+                        else if (view === 'recover') {
+                            container.innerHTML = `<h3>Reset Password</h3><div class="account-form" id="recoverForm"><div class="input-group"><label>Email or Mobile</label><input id="recId" class="account-input"></div><div class="input-group"><label>New Password</label><input id="newPwdRec" type="password" class="account-input"></div><div id="captchaAnchorRecover"></div><button class="btn-account" id="resetPwdBtn">Reset →</button><button class="toggle-auth" id="backRec">← Back</button></div>`;
+                            let captchaOk = false;
+                            renderCaptcha('captchaAnchorRecover', () => captchaOk = true);
                             document.getElementById('resetPwdBtn')?.addEventListener('click', () => {
+                                if (!captchaOk) { showToast("Complete CAPTCHA", true); return; }
                                 const idf = document.getElementById('recId').value.trim();
                                 const newP = document.getElementById('newPwdRec').value;
                                 const foundUser = users.find(u => u.email === idf || u.mobile === idf);
-                                if(!foundUser) { showToast("Account not found", true); return; }
-                                if(!validatePassword(newP)) { showToast("Password: min 5 chars, letters/numbers only", true); return; }
+                                if (!foundUser) { showToast("Account not found", true); return; }
+                                if (!validatePassword(newP)) { showToast("Password: min 5 chars", true); return; }
                                 foundUser.password = newP;
                                 saveUsers();
-                                showToast("Password reset successfully! Please sign in.");
-                                view = 'signin';
-                                renderAuth();
+                                showToast("Password reset! Please sign in.");
+                                view = 'signin'; renderAuth();
                             });
                             document.getElementById('backRec')?.addEventListener('click', () => { view = 'signin'; renderAuth(); });
                         }
-                        document.querySelectorAll('#accountDynamicContent button').forEach(attachRipple);
                     }
                     renderAuth();
                 }
-                document.querySelectorAll('#accountDynamicContent button, #accountDynamicContent #avatarTrigger').forEach(attachRipple);
+                updateHeaderAvatar();
+                document.querySelectorAll('#accountDynamicContent button').forEach(attachRipple);
             }
-
+            
+            // Sidebar controls
             const overlayMenu = document.getElementById('overlayMenu');
             const sidebarMenu = document.getElementById('sidebarMenu');
             const hamburger = document.getElementById('hamburgerBtn');
             const closeSidebar = document.getElementById('closeSidebarBtn');
+            
             function closeMenu() { sidebarMenu.classList.remove('open'); overlayMenu.classList.remove('active'); hamburger.classList.remove('active'); document.body.style.overflow = ''; }
             function openMenu() { sidebarMenu.classList.add('open'); overlayMenu.classList.add('active'); hamburger.classList.add('active'); document.body.style.overflow = 'hidden'; }
-            hamburger?.addEventListener('click', () => { if(sidebarMenu.classList.contains('open')) closeMenu(); else openMenu(); });
+            
+            hamburger?.addEventListener('click', () => { if (sidebarMenu.classList.contains('open')) closeMenu(); else openMenu(); });
             overlayMenu?.addEventListener('click', closeMenu);
             closeSidebar?.addEventListener('click', closeMenu);
-
+            
             const accountSidebar = document.getElementById('accountSidebar');
             const overlayAccount = document.getElementById('overlayAccount');
             const profileBtn = document.getElementById('profileAvatarBtn');
+            
             function openAccountSidebar() { accountSidebar.classList.add('open'); overlayAccount.classList.add('active'); document.body.style.overflow = 'hidden'; renderAccountSidebar(); }
             function closeAccountSidebar() { accountSidebar.classList.remove('open'); overlayAccount.classList.remove('active'); document.body.style.overflow = ''; }
+            
             profileBtn?.addEventListener('click', openAccountSidebar);
             document.getElementById('closeAccountSidebar')?.addEventListener('click', closeAccountSidebar);
             overlayAccount?.addEventListener('click', closeAccountSidebar);
-
-            function updateHeaderAvatar() {
-                const img = document.getElementById('profileAvatarImg');
-                const placeholder = document.getElementById('avatarPlaceholder');
-                if(currentUser?.avatar) { img.src = currentUser.avatar; img.style.display = 'block'; placeholder.style.display = 'none'; }
-                else { img.style.display = 'none'; placeholder.style.display = 'flex'; placeholder.textContent = currentUser?.username?.charAt(0) || '👤'; }
-            }
-            const origRender = renderAccountSidebar;
-            renderAccountSidebar = function() { origRender(); updateHeaderAvatar(); };
-            updateHeaderAvatar();
-
+            
+            // Theme
             const body = document.body;
             const themeBtn = document.getElementById('themeBtn');
             const themeLabel = document.getElementById('themeLabel');
-            if(localStorage.getItem('dtl-theme') === 'dark') { body.classList.add('dark'); themeLabel.innerText = 'Dark'; }
+            if (localStorage.getItem('dtl-theme') === 'dark') { body.classList.add('dark'); themeLabel.innerText = 'Dark'; }
             themeBtn?.addEventListener('click', () => { body.classList.toggle('dark'); localStorage.setItem('dtl-theme', body.classList.contains('dark') ? 'dark' : 'light'); themeLabel.innerText = body.classList.contains('dark') ? 'Dark' : 'Light'; });
-
+            
+            // Menu actions
+            document.getElementById('teamActionBtn')?.addEventListener('click', () => { closeMenu(); navigateTo('team'); });
             document.getElementById('aiActionBtn')?.addEventListener('click', () => showToast("🚀 AI Nexus · coming soon"));
             document.getElementById('donateActionBtn')?.addEventListener('click', () => showToast("💖 Donate & Support · coming soon"));
-
-            document.querySelectorAll('.theme-toggle, .profile-avatar, .hamburger, .card-item, .menu-action-btn, #closeSidebarBtn, #closeAccountSidebar').forEach(attachRipple);
-            document.querySelectorAll('.card-item').forEach(attachRipple);
+            
+            // Attach ripple
+            document.querySelectorAll('.theme-toggle, .profile-avatar, .hamburger, .card-item, .menu-action-btn, .close-btn, .btn-account, .toggle-auth').forEach(attachRipple);
+            
+            navigateTo('home');
         })();
     </script>
 </body>
+</html>
 </html>
