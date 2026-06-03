@@ -450,10 +450,19 @@
             color: white;
             cursor: pointer;
             box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-            transition: all 0.3s var(--transition-smooth);
+            transition: all 0.4s cubic-bezier(0.34, 1.2, 0.64, 1);
+            opacity: 0;
+            transform: translateY(20px) scale(0.9);
+            pointer-events: none;
         }
         
-        .floating-home-btn:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 10px 25px rgba(95,139,255,0.4); }
+        .floating-home-btn.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+            pointer-events: auto;
+        }
+        
+        .floating-home-btn:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 10px 25px rgba(95,139,255,0.5); }
 
         /* Loading Animation */
         .loading-overlay {
@@ -674,6 +683,32 @@
         }
         
         body.dark .toggle-auth { color: #9eb9ff; }
+
+        /* Advanced Line Chart */
+        .chart-line-container {
+            position: relative;
+            margin: 1rem 0;
+        }
+        .line-chart-svg {
+            width: 100%;
+            overflow: visible;
+        }
+        .chart-line {
+            stroke-width: 3;
+            fill: none;
+            transition: all 0.7s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+        }
+        .chart-area {
+            transition: opacity 0.5s ease;
+        }
+        .chart-dot {
+            transition: r 0.2s, filter 0.2s;
+            cursor: pointer;
+        }
+        .chart-dot:hover {
+            r: 8;
+            filter: drop-shadow(0 0 6px rgba(95,139,255,0.8));
+        }
     </style>
 </head>
 <body>
@@ -696,9 +731,8 @@
             </div>
         </div>
         <div id="pageContent"></div>
-        <button id="floatingHomeBtn" class="floating-home-btn" style="display: none;">🏠 Home</button>
+        <button id="floatingHomeBtn" class="floating-home-btn">🏠 Home</button>
         
-        <!-- Footer with Support Email -->
         <footer class="site-footer">
             <div class="support-email">
                 📧 <strong>Support:</strong> Lumenearthstudio@gmail.com
@@ -707,27 +741,16 @@
         </footer>
     </div>
 
-    <!-- Loading Overlay -->
-    <div id="loadingOverlay" class="loading-overlay">
-        <div class="loading-card">
-            <div id="loadingSpinner" class="spinner"></div>
-            <div id="loadingCheckmark" class="checkmark" style="display: none;">✅</div>
-            <h3 id="loadingTitle">Creating Account</h3>
-            <div id="loadingSteps"></div>
-        </div>
-    </div>
+    <div id="loadingOverlay" class="loading-overlay"><div class="loading-card"><div id="loadingSpinner" class="spinner"></div><div id="loadingCheckmark" class="checkmark" style="display: none;">✅</div><h3 id="loadingTitle">Creating Account</h3><div id="loadingSteps"></div></div></div>
 
-    <!-- Sidebars -->
     <div class="overlay-menu" id="overlayMenu"></div>
     <div class="sidebar" id="sidebarMenu">
         <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2rem;">
-            <div style="text-align: center;">
-                <div style="font-size: 3rem;">✨</div>
-                <div style="font-weight: 600;">Portal</div>
-            </div>
+            <div style="text-align: center;"><div style="font-size: 3rem;">✨</div><div style="font-weight: 600;">Portal</div></div>
             <button class="menu-action-btn" id="teamActionBtn">👥 Our Team</button>
             <button class="menu-action-btn" id="aiActionBtn">🤖 AI · Intelligence</button>
             <button class="menu-action-btn" id="donateActionBtn">❤️ Donate & Support</button>
+            <button class="menu-action-btn" id="adminActionBtn">🛡️ Admins & Management</button>
             <button id="closeSidebarBtn" class="close-btn" style="width: auto; padding: 0.6rem 1.5rem;">✕ Close</button>
         </div>
     </div>
@@ -745,7 +768,6 @@
 
     <script>
         (function() {
-            // Ripple Effect
             function addRipple(e, el) {
                 const rect = el.getBoundingClientRect();
                 const size = Math.max(rect.width, rect.height);
@@ -763,413 +785,135 @@
                 el.appendChild(ripple);
                 setTimeout(() => ripple.remove(), 600);
             }
-            
-            function attachRipple(el) {
-                if (el && !el.dataset.rippled) {
-                    el.addEventListener('click', (e) => addRipple(e, el));
-                    el.dataset.rippled = 'true';
-                }
-            }
+            function attachRipple(el) { if (el && !el.dataset.rippled) { el.addEventListener('click', (e) => addRipple(e, el)); el.dataset.rippled = 'true'; } }
 
-            // Loading Animation
-            function showLoadingAnimation(onComplete) {
-                const overlay = document.getElementById('loadingOverlay');
-                const spinner = document.getElementById('loadingSpinner');
-                const checkmark = document.getElementById('loadingCheckmark');
-                const loadingTitle = document.getElementById('loadingTitle');
-                const stepsContainer = document.getElementById('loadingSteps');
-                
-                const steps = [
-                    { text: "Checking availability...", completed: false },
-                    { text: "Encrypting credentials...", completed: false },
-                    { text: "Creating secure profile...", completed: false },
-                    { text: "Finalizing account...", completed: false }
-                ];
-                
-                stepsContainer.innerHTML = steps.map((step, i) => `
-                    <div class="step-item" id="step-${i}">
-                        <div class="step-icon" id="step-icon-${i}">○</div>
-                        <span id="step-text-${i}">${step.text}</span>
-                    </div>
-                `).join('');
-                
-                overlay.classList.add('active');
-                spinner.style.display = 'block';
-                checkmark.style.display = 'none';
-                loadingTitle.textContent = "Creating Account";
-                
-                let currentStep = 0;
-                
-                function completeStep(index) {
-                    const icon = document.getElementById(`step-icon-${index}`);
-                    const textSpan = document.getElementById(`step-text-${index}`);
-                    if (icon) {
-                        icon.innerHTML = '✓';
-                        icon.classList.add('complete');
-                    }
-                    steps[index].completed = true;
-                    
-                    if (index === steps.length - 1) {
-                        setTimeout(() => {
-                            spinner.style.display = 'none';
-                            checkmark.style.display = 'block';
-                            loadingTitle.textContent = "Account Created!";
-                            setTimeout(() => {
-                                overlay.classList.remove('active');
-                                if (onComplete) onComplete();
-                            }, 800);
-                        }, 500);
-                    } else {
-                        setTimeout(() => {
-                            currentStep++;
-                            const nextIcon = document.getElementById(`step-icon-${currentStep}`);
-                            if (nextIcon) {
-                                nextIcon.innerHTML = '●';
-                                nextIcon.classList.add('active');
-                            }
-                            completeStep(currentStep);
-                        }, 600);
-                    }
-                }
-                
-                const firstIcon = document.getElementById('step-icon-0');
-                if (firstIcon) {
-                    firstIcon.innerHTML = '●';
-                    firstIcon.classList.add('active');
-                }
-                completeStep(0);
-            }
-
-            // User Management
             let users = JSON.parse(localStorage.getItem('dtl_users')) || [];
             let currentUser = JSON.parse(localStorage.getItem('dtl_currentUser')) || null;
-            
             function saveUsers() { localStorage.setItem('dtl_users', JSON.stringify(users)); }
             function saveCurrentUser() { localStorage.setItem('dtl_currentUser', JSON.stringify(currentUser)); }
             function validateEmail(email) { return /^[^\s@]+@[^\s@]+\.(com|org|net|io|co)$/i.test(email); }
             function validatePhone(phone) { return /^(\+1[0-9]{10}|\+44[0-9]{10}|\+81[0-9]{10}|\+98[0-9]{10}|[0-9]{10,13})$/.test(phone) || /^[0-9]{10,13}$/.test(phone); }
             function validatePassword(pwd) { return /^[A-Za-z0-9]{5,}$/.test(pwd); }
             function validateUsername(name) { return name.length >= 3 && name.length <= 20; }
-            function showToast(msg, isErr = false) { 
-                const toast = document.getElementById('toastMessage'); 
-                toast.textContent = msg; 
-                toast.classList.add('show'); 
-                if (window.toastTimeout) clearTimeout(window.toastTimeout); 
-                window.toastTimeout = setTimeout(() => toast.classList.remove('show'), 2500); 
-            }
+            function showToast(msg) { const toast = document.getElementById('toastMessage'); toast.textContent = msg; toast.classList.add('show'); if (window.toastTimeout) clearTimeout(window.toastTimeout); window.toastTimeout = setTimeout(() => toast.classList.remove('show'), 2500); }
             
-            // Navigation
             let currentPage = 'home';
             const contentDiv = document.getElementById('pageContent');
             const homeBtn = document.getElementById('floatingHomeBtn');
-            
+            let adminInterval = null;
+
             function showHomeButton(show) {
-                homeBtn.style.display = show ? 'flex' : 'none';
+                if(show) homeBtn.classList.add('visible');
+                else homeBtn.classList.remove('visible');
             }
             
             function navigateTo(page) {
+                if (adminInterval) { clearInterval(adminInterval); adminInterval = null; }
                 currentPage = page;
-                if (page === 'home') {
-                    renderHomePage();
-                    showHomeButton(false);
-                } else if (page === 'team') {
-                    renderTeamPage();
-                    showHomeButton(true);
-                }
+                if (page === 'home') { renderHomePage(); showHomeButton(false); }
+                else if (page === 'team') { renderTeamPage(); showHomeButton(true); }
+                else if (page === 'admin') { renderAdminGatePage(); showHomeButton(true); }
             }
             
             function renderHomePage() {
-                contentDiv.innerHTML = `
-                    <div class="hero">
-                        <h1 class="hero-title">from shadow to radiance</h1>
-                        <p class="hero-desc" style="margin-top: 1rem; opacity: 0.75;">Infinite fluid · Premium verification · Global secure system</p>
-                        <div class="grid-cards">
-                            <div class="card-item"><div style="font-size: 2.5rem;">✦</div><div style="font-weight: 600; margin-top: 0.5rem;">Luminary</div></div>
-                            <div class="card-item"><div style="font-size: 2.5rem;">◈</div><div style="font-weight: 600; margin-top: 0.5rem;">Noctis</div></div>
-                            <div class="card-item"><div style="font-size: 2.5rem;">○</div><div style="font-weight: 600; margin-top: 0.5rem;">Aether</div></div>
-                        </div>
-                    </div>
-                `;
+                contentDiv.innerHTML = `<div class="hero"><h1 class="hero-title">from shadow to radiance</h1><p class="hero-desc" style="margin-top: 1rem; opacity: 0.75;">Infinite fluid · Premium verification · Global secure system</p><div class="grid-cards"><div class="card-item"><div style="font-size: 2.5rem;">✦</div><div style="font-weight: 600; margin-top: 0.5rem;">Luminary</div></div><div class="card-item"><div style="font-size: 2.5rem;">◈</div><div style="font-weight: 600; margin-top: 0.5rem;">Noctis</div></div><div class="card-item"><div style="font-size: 2.5rem;">○</div><div style="font-weight: 600; margin-top: 0.5rem;">Aether</div></div></div></div>`;
                 document.querySelectorAll('.card-item').forEach(attachRipple);
             }
-            
             function renderTeamPage() {
-                contentDiv.innerHTML = `
-                    <div style="max-width: 800px; margin: 2rem auto; animation: heroMorph 0.6s var(--transition-smooth);">
-                        <div style="background: var(--card-light); backdrop-filter: blur(24px); border-radius: 2rem; padding: 2rem; text-align: center;">
-                            <div style="font-size: 4.5rem;">🧠</div>
-                            <h1 style="font-size: 2.8rem; font-weight: 800; background: linear-gradient(135deg, #5f8bff, #aac2ff); background-clip: text; -webkit-background-clip: text; color: transparent;">Arfan</h1>
-                            <p style="font-size: 1rem; opacity: 0.8; margin-bottom: 1.5rem;">Mastermind · Technical Genius</p>
-                            <p style="font-size: 1.1rem; line-height: 1.6;">✨ <strong>Arfan</strong>, the technical brain of our team, possesses profound knowledge across <span style="color: #5f8bff; font-weight: 700;">four powerful programming languages</span>: <strong>C#, GDScript, Python, and Java</strong>. His extraordinary ability in software and game development pushes boundaries.</p>
-                            <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 0.8rem; margin: 1.5rem 0;">
-                                <span style="background: rgba(95,139,255,0.15); padding: 0.4rem 1.2rem; border-radius: 40px;">⚡ C#</span>
-                                <span style="background: rgba(95,139,255,0.15); padding: 0.4rem 1.2rem; border-radius: 40px;">🎮 GDScript</span>
-                                <span style="background: rgba(95,139,255,0.15); padding: 0.4rem 1.2rem; border-radius: 40px;">🐍 Python</span>
-                                <span style="background: rgba(95,139,255,0.15); padding: 0.4rem 1.2rem; border-radius: 40px;">☕ Java</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
+                contentDiv.innerHTML = `<div style="max-width: 800px; margin: 2rem auto; animation: heroMorph 0.6s var(--transition-smooth);"><div style="background: var(--card-light); backdrop-filter: blur(24px); border-radius: 2rem; padding: 2rem; text-align: center;"><div style="font-size: 4.5rem;">🧠</div><h1 style="font-size: 2.8rem; font-weight: 800; background: linear-gradient(135deg, #5f8bff, #aac2ff); background-clip: text; -webkit-background-clip: text; color: transparent;">Erfan</h1><p style="font-size: 1rem; opacity: 0.8; margin-bottom: 1.5rem;">Mastermind · Technical Genius</p><p style="font-size: 1.1rem; line-height: 1.6;">✨ <strong>Erfan</strong>, the technical brain of our team, possesses profound knowledge across <span style="color: #5f8bff; font-weight: 700;">four powerful programming languages</span>: <strong>C#, GDScript, Python, and Java</strong>. His extraordinary ability in software and game development pushes boundaries.</p><div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 0.8rem; margin: 1.5rem 0;"><span style="background: rgba(95,139,255,0.15); padding: 0.4rem 1.2rem; border-radius: 40px;">⚡ C#</span><span style="background: rgba(95,139,255,0.15); padding: 0.4rem 1.2rem; border-radius: 40px;">🎮 GDScript</span><span style="background: rgba(95,139,255,0.15); padding: 0.4rem 1.2rem; border-radius: 40px;">🐍 Python</span><span style="background: rgba(95,139,255,0.15); padding: 0.4rem 1.2rem; border-radius: 40px;">☕ Java</span></div></div></div>`;
             }
             
-            homeBtn?.addEventListener('click', (e) => { addRipple(e, homeBtn); navigateTo('home'); });
-            
-            // CAPTCHA System
-            let currentCaptchaSolution = null;
-            
-            function generateCaptcha() {
-                const types = ['sum', 'click', 'shape', 'slider'];
-                const chosen = types[Math.floor(Math.random() * types.length)];
-                
-                if (chosen === 'sum') {
-                    const a = Math.floor(Math.random() * 15) + 2;
-                    const b = Math.floor(Math.random() * 15) + 2;
-                    currentCaptchaSolution = a + b;
-                    return { html: `<div class="captcha-puzzle"><span class="captcha-question">🔐 ${a} + ${b} = ?</span><input type="text" id="captchaInput" class="captcha-input" placeholder="Answer"><button id="captchaVerifyBtn" class="captcha-btn">Verify</button></div>`, validator: (val) => parseInt(val) === currentCaptchaSolution };
-                }
-                else if (chosen === 'click') {
-                    currentCaptchaSolution = 'clicked';
-                    return { html: `<div class="captcha-puzzle"><span class="captcha-question">🖱️ Click to verify</span><button id="captchaClickBtn" class="captcha-btn">I'm not a robot 👆</button></div>`, validator: (val) => val === 'clicked' };
-                }
-                else if (chosen === 'shape') {
-                    const shapes = ['◻️ Square', '🔴 Circle', '▲ Triangle'];
-                    const correct = shapes[Math.floor(Math.random() * 3)];
-                    currentCaptchaSolution = correct;
-                    return { html: `<div class="captcha-puzzle"><span class="captcha-question">Select: <strong>${correct}</strong></span><div style="display: flex; gap: 0.6rem;">${shapes.map(s => `<button type="button" data-shape="${s}" class="captcha-shape-btn">${s}</button>`).join('')}</div></div>`, validator: (val) => val === correct };
-                }
-                else {
-                    currentCaptchaSolution = 'slider';
-                    return { html: `<div class="captcha-puzzle"><span class="captcha-question">🎚️ Slide to 100%</span><input type="range" id="captchaSlider" min="0" max="100" value="0" style="width: 100%;"><div id="sliderHint" style="font-size: 0.7rem;">Move slider to the end →</div></div>`, validator: (val) => val === 'slider' };
-                }
-            }
-            
-            function renderCaptcha(containerId, onSuccess) {
-                const captchaData = generateCaptcha();
-                const captchaDiv = document.createElement('div');
-                captchaDiv.className = 'captcha-container';
-                captchaDiv.innerHTML = `<div style="margin-bottom: 0.3rem; font-size: 0.75rem;">🤖 <span style="font-weight: 600;">Verification</span></div>${captchaData.html}<div id="captchaStatus" style="font-size: 0.7rem; margin-top: 0.5rem; color: #f9a825;">⚠️ Please verify</div>`;
-                
-                const container = document.getElementById(containerId);
-                if (container) {
-                    container.innerHTML = '';
-                    container.appendChild(captchaDiv);
-                }
-                
-                let resolved = false;
-                const setValid = () => {
-                    if (!resolved) {
-                        resolved = true;
-                        const statusDiv = captchaDiv.querySelector('#captchaStatus');
-                        if (statusDiv) { statusDiv.innerHTML = '✅ Verified successfully'; statusDiv.style.color = '#00c853'; }
-                        if (onSuccess) onSuccess();
-                    }
-                };
-                
-                if (currentCaptchaSolution === 'clicked') {
-                    captchaDiv.querySelector('#captchaClickBtn')?.addEventListener('click', () => setValid());
-                } 
-                else if (currentCaptchaSolution === 'slider') {
-                    const slider = captchaDiv.querySelector('#captchaSlider');
-                    if (slider) slider.addEventListener('input', (e) => { if (parseInt(e.target.value) === 100) setValid(); });
-                } 
-                else if (typeof currentCaptchaSolution === 'number') {
-                    captchaDiv.querySelector('#captchaVerifyBtn')?.addEventListener('click', () => {
-                        const input = captchaDiv.querySelector('#captchaInput');
-                        if (input && parseInt(input.value) === currentCaptchaSolution) setValid();
-                        else { const st = captchaDiv.querySelector('#captchaStatus'); if (st) st.innerHTML = '❌ Wrong answer'; }
-                    });
-                } 
-                else {
-                    captchaDiv.querySelectorAll('.captcha-shape-btn').forEach(btn => {
-                        btn.addEventListener('click', () => {
-                            if (btn.getAttribute('data-shape') === currentCaptchaSolution) setValid();
-                            else { const st = captchaDiv.querySelector('#captchaStatus'); if (st) st.innerHTML = '❌ Incorrect shape'; }
-                        });
-                    });
-                }
+            function renderAdminGatePage() {
+                contentDiv.innerHTML = `<div style="max-width: 550px; margin: 3rem auto; animation: heroMorph 0.5s var(--transition-smooth);"><div class="admin-stats-card" style="background: var(--card-light); backdrop-filter: blur(24px); border-radius: 2.5rem; padding: 2rem; text-align: center;"><div style="font-size: 3rem;">🔐</div><h2 style="font-size: 1.8rem; font-weight: 700;">Admin Security Code</h2><p style="margin: 0.8rem 0 1.5rem; opacity: 0.7;">Enter the master admin key to access analytics</p><div class="input-group" style="margin-bottom: 1.5rem;"><label>🔑 Security Code</label><input type="password" id="adminCodeInput" class="account-input" placeholder="••••••••" style="text-align: center;"></div><button id="verifyAdminBtn" class="btn-account" style="width: 100%;">🛡️ Verify & Enter</button><div id="adminRuleBox" style="margin-top: 2rem; font-size: 0.8rem; border-top: 1px solid rgba(95,139,255,0.3); padding-top: 1.2rem;"><span style="font-weight: 600;">📜 High-Security Protocol:</span> All administrator accounts are under surveillance. Advanced logging & neural audit active.</div></div></div>`;
+                document.getElementById('verifyAdminBtn')?.addEventListener('click', () => {
+                    if (document.getElementById('adminCodeInput').value.trim() === "erfan1388amir1388gamedev1388") {
+                        showToast("✅ Access Granted · Welcome Admin");
+                        renderAdminDashboard();
+                    } else showToast("❌ Invalid Security Code · Access Denied", true);
+                });
             }
 
-            function updateHeaderAvatar() {
-                const img = document.getElementById('profileAvatarImg');
-                const placeholder = document.getElementById('avatarPlaceholder');
-                if (currentUser?.avatar) { 
-                    img.src = currentUser.avatar; 
-                    img.style.display = 'block'; 
-                    placeholder.style.display = 'none'; 
-                } else { 
-                    img.style.display = 'none'; 
-                    placeholder.style.display = 'flex'; 
-                    placeholder.textContent = currentUser?.username?.charAt(0) || '👤'; 
+            function renderAdminDashboard() {
+                let dataPoints = [120, 340, 520, 280, 590, 410, 330];
+                let intervalId = null;
+                function getColorByValue(val) {
+                    if (val < 200) return "#00c853";
+                    if (val < 400) return "#5f8bff";
+                    if (val < 550) return "#ff9800";
+                    return "#ff5252";
                 }
-            }
-            
-            function renderAccountSidebar() {
-                const container = document.getElementById('accountDynamicContent');
-                if (!container) return;
-                
-                if (currentUser) {
-                    container.innerHTML = `
-                        <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
-                            <div id="avatarTrigger" style="width: 100px; height: 100px; border-radius: 100px; background: rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden;">
-                                ${currentUser.avatar ? `<img src="${currentUser.avatar}" style="width: 100%; height: 100%; object-fit: cover;">` : `<span style="font-size: 3rem;">${currentUser.username?.charAt(0) || '👤'}</span>`}
-                            </div>
-                            <input type="file" id="avatarUpload" accept="image/*" style="display: none;">
-                            <h3 style="font-weight: 700;">${currentUser.username}</h3>
-                            <p style="font-size: 0.8rem; opacity: 0.8;">${currentUser.email} | ${currentUser.mobile}</p>
-                            <button id="enableEditBtn" class="menu-action-btn" style="width: auto; padding: 0.5rem 1.2rem;">✎ Edit Profile</button>
-                            <button id="logoutBtn" class="menu-action-btn" style="width: auto; padding: 0.5rem 1.2rem; background: rgba(224,90,90,0.2);">🚪 Logout</button>
-                            <div id="editPanel" style="display: none; margin-top: 1rem; width: 100%;">
-                                <div class="input-group"><label>Username</label><input id="editUser" class="account-input" value="${currentUser.username}"></div>
-                                <div class="input-group"><label>Email</label><input id="editEmail" class="account-input" value="${currentUser.email}"></div>
-                                <div class="input-group"><label>Mobile</label><input id="editMobile" class="account-input" value="${currentUser.mobile}"></div>
-                                <div class="input-group"><label>New Password</label><input id="editPass" type="password" class="account-input" placeholder="min 5 chars"></div>
-                                <button id="saveEditBtn" class="btn-account">Save Changes</button>
-                            </div>
-                        </div>
-                    `;
-                    
-                    document.getElementById('avatarTrigger')?.addEventListener('click', () => document.getElementById('avatarUpload').click());
-                    document.getElementById('avatarUpload')?.addEventListener('change', (e) => {
-                        const file = e.target.files[0];
-                        if (file) { const reader = new FileReader(); reader.onload = (ev) => { currentUser.avatar = ev.target.result; saveCurrentUser(); renderAccountSidebar(); showToast("Avatar updated!"); }; reader.readAsDataURL(file); }
-                    });
-                    document.getElementById('enableEditBtn')?.addEventListener('click', () => document.getElementById('editPanel').style.display = 'block');
-                    document.getElementById('saveEditBtn')?.addEventListener('click', () => {
-                        const newUser = document.getElementById('editUser').value.trim();
-                        const newEmail = document.getElementById('editEmail').value.trim();
-                        const newMobile = document.getElementById('editMobile').value.trim();
-                        const newPass = document.getElementById('editPass').value;
-                        if (!validateUsername(newUser)) { showToast("Username 3-20 chars", true); return; }
-                        if (!validateEmail(newEmail)) { showToast("Invalid email", true); return; }
-                        if (!validatePhone(newMobile)) { showToast("Invalid phone", true); return; }
-                        if (newPass && !validatePassword(newPass)) { showToast("Password: min 5 chars", true); return; }
-                        currentUser.username = newUser; currentUser.email = newEmail; currentUser.mobile = newMobile;
-                        if (newPass) currentUser.password = newPass;
-                        const idx = users.findIndex(u => u.id === currentUser.id);
-                        if (idx !== -1) users[idx] = { ...currentUser };
-                        saveUsers(); saveCurrentUser();
-                        showToast("Profile updated!"); renderAccountSidebar();
-                    });
-                    document.getElementById('logoutBtn')?.addEventListener('click', () => { currentUser = null; saveCurrentUser(); renderAccountSidebar(); closeAccountSidebar(); showToast("Logged out"); });
-                } else {
-                    let view = 'signin';
-                    function renderAuth() {
-                        if (view === 'signin') {
-                            container.innerHTML = `<h3>Welcome back</h3><div class="account-form" id="signinForm"><div class="input-group"><label>Email or Mobile</label><input id="loginId" class="account-input"></div><div class="input-group"><label>Password</label><input id="loginPwd" type="password" class="account-input"></div><div id="captchaAnchorSignin"></div><button class="btn-account" id="doLogin">Sign In →</button><button class="toggle-auth" id="toSignup">✨ No account? Create</button><button class="toggle-auth" id="toRecover">🔐 Forgot password?</button></div>`;
-                            let captchaOk = false;
-                            renderCaptcha('captchaAnchorSignin', () => captchaOk = true);
-                            document.getElementById('doLogin')?.addEventListener('click', () => {
-                                if (!captchaOk) { showToast("Complete CAPTCHA first", true); return; }
-                                const id = document.getElementById('loginId').value.trim();
-                                const pwd = document.getElementById('loginPwd').value;
-                                const user = users.find(u => (u.email === id || u.mobile === id) && u.password === pwd);
-                                if (user) { currentUser = user; saveCurrentUser(); showToast(`Welcome ${user.username}`); renderAccountSidebar(); closeAccountSidebar(); }
-                                else showToast("Invalid credentials", true);
-                            });
-                            document.getElementById('toSignup')?.addEventListener('click', () => { view = 'signup'; renderAuth(); });
-                            document.getElementById('toRecover')?.addEventListener('click', () => { view = 'recover'; renderAuth(); });
-                        } 
-                        else if (view === 'signup') {
-                            container.innerHTML = `<h3>Create account</h3><div class="account-form" id="signupForm"><div class="input-group"><label>Username (3-20)</label><input id="suName" class="account-input"></div><div class="input-group"><label>Mobile</label><input id="suMobile" class="account-input" placeholder="+1234567890"></div><div class="input-group"><label>Email</label><input id="suEmail" class="account-input"></div><div class="input-group"><label>Password (min 5)</label><input id="suPwd" type="password" class="account-input"></div><div id="captchaAnchorSignup"></div><button class="btn-account" id="doSignup">Create Account →</button><button class="toggle-auth" id="backSignin">← Back</button></div>`;
-                            let captchaOk = false;
-                            renderCaptcha('captchaAnchorSignup', () => captchaOk = true);
-                            document.getElementById('doSignup')?.addEventListener('click', () => {
-                                if (!captchaOk) { showToast("Complete CAPTCHA", true); return; }
-                                const name = document.getElementById('suName').value.trim();
-                                const mobile = document.getElementById('suMobile').value.trim();
-                                const email = document.getElementById('suEmail').value.trim();
-                                const pwd = document.getElementById('suPwd').value;
-                                
-                                if (!validateUsername(name)) { showToast("Username 3-20 chars", true); return; }
-                                if (!validatePhone(mobile)) { showToast("Invalid phone number", true); return; }
-                                if (!validateEmail(email)) { showToast("Invalid email format (must contain @ and .com)", true); return; }
-                                if (!validatePassword(pwd)) { showToast("Password: min 5 chars, letters & numbers only", true); return; }
-                                
-                                // Check if user exists
-                                if (users.find(u => u.email === email)) { showToast("Email already registered", true); return; }
-                                if (users.find(u => u.mobile === mobile)) { showToast("Phone number already registered", true); return; }
-                                
-                                // Show loading animation then create account
-                                showLoadingAnimation(() => {
-                                    const newUser = { username: name, mobile, email, password: pwd, id: Date.now().toString(), avatar: null };
-                                    users.push(newUser); 
-                                    saveUsers(); 
-                                    currentUser = newUser; 
-                                    saveCurrentUser();
-                                    showToast("Account created successfully!");
-                                    renderAccountSidebar(); 
-                                    closeAccountSidebar();
-                                });
-                            });
-                            document.getElementById('backSignin')?.addEventListener('click', () => { view = 'signin'; renderAuth(); });
-                        } 
-                        else if (view === 'recover') {
-                            container.innerHTML = `<h3>Reset Password</h3><div class="account-form" id="recoverForm"><div class="input-group"><label>Email or Mobile</label><input id="recId" class="account-input"></div><div class="input-group"><label>New Password</label><input id="newPwdRec" type="password" class="account-input"></div><div id="captchaAnchorRecover"></div><button class="btn-account" id="resetPwdBtn">Reset →</button><button class="toggle-auth" id="backRec">← Back</button></div>`;
-                            let captchaOk = false;
-                            renderCaptcha('captchaAnchorRecover', () => captchaOk = true);
-                            document.getElementById('resetPwdBtn')?.addEventListener('click', () => {
-                                if (!captchaOk) { showToast("Complete CAPTCHA", true); return; }
-                                const idf = document.getElementById('recId').value.trim();
-                                const newP = document.getElementById('newPwdRec').value;
-                                const foundUser = users.find(u => u.email === idf || u.mobile === idf);
-                                if (!foundUser) { showToast("Account not found", true); return; }
-                                if (!validatePassword(newP)) { showToast("Password: min 5 chars", true); return; }
-                                foundUser.password = newP;
-                                saveUsers();
-                                showToast("Password reset! Please sign in.");
-                                view = 'signin'; renderAuth();
-                            });
-                            document.getElementById('backRec')?.addEventListener('click', () => { view = 'signin'; renderAuth(); });
-                        }
+                function drawChart(values) {
+                    const svgWidth = Math.min(700, window.innerWidth - 80);
+                    const width = svgWidth - 80;
+                    const height = 220;
+                    const padding = 40;
+                    const step = width / (values.length - 1);
+                    const maxVal = 620;
+                    const points = values.map((val, idx) => ({ x: padding + idx * step, y: height - padding - (val / maxVal) * (height - padding * 2) }));
+                    let pathD = `M ${points[0].x} ${points[0].y}`;
+                    for (let i = 1; i < points.length; i++) pathD += ` L ${points[i].x} ${points[i].y}`;
+                    let areaPath = `${pathD} L ${points[points.length-1].x} ${height - padding} L ${points[0].x} ${height - padding} Z`;
+                    const gradientId = `grad-${Date.now()}`;
+                    const chartHtml = `<svg class="line-chart-svg" viewBox="0 0 ${svgWidth} ${height}" preserveAspectRatio="none" style="width:100%; height:auto; max-height:260px;"><defs><linearGradient id="${gradientId}" x1="0%" y1="0%" x2="0%" y2="100%"><stop offset="0%" stop-color="${getColorByValue(values[values.length-1])}" stop-opacity="0.35"/><stop offset="100%" stop-color="${getColorByValue(values[values.length-1])}" stop-opacity="0.02"/></linearGradient></defs><path class="chart-area" d="${areaPath}" fill="url(#${gradientId})" stroke="none"/><path class="chart-line" d="${pathD}" stroke="${getColorByValue(values[values.length-1])}" stroke-width="3" fill="none" stroke-linecap="round"/>${points.map((p,i)=>`<circle class="chart-dot" cx="${p.x}" cy="${p.y}" r="5" fill="${getColorByValue(values[i])}" stroke="#fff" stroke-width="2"/>`).join('')}</svg><div style="display: flex; justify-content: space-between; margin-top: 0.5rem; padding: 0 10px;">${values.map((v,i)=>`<div style="text-align:center; font-size:0.7rem;"><span style="font-weight:bold;">${v}</span><br><span style="opacity:0.6;">Day ${i+1}</span></div>`).join('')}</div>`;
+                    document.getElementById('liveChartArea').innerHTML = chartHtml;
+                    document.getElementById('currentViewsSpan').innerText = values[values.length-1];
+                }
+                function randomizeChart() {
+                    const newVals = dataPoints.map(() => Math.floor(Math.random() * 591) + 10);
+                    dataPoints = newVals;
+                    drawChart(dataPoints);
+                }
+                contentDiv.innerHTML = `<div style="max-width: 950px; margin: 2rem auto; animation: heroMorph 0.6s ease-out;"><div class="admin-stats-card" style="background: var(--card-light); backdrop-filter: blur(24px); border-radius: 2.5rem; padding: 2rem;"><div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap;"><h2 style="font-size: 2rem; font-weight: 800; background: linear-gradient(135deg, #5f8bff, #aac2ff); background-clip: text; -webkit-background-clip: text; color: transparent;">📊 Live Analytics · Advanced Line Chart</h2><span style="background: rgba(95,139,255,0.2); padding: 0.4rem 1.2rem; border-radius: 60px;">Real-time</span></div><p style="margin: 0.5rem 0 1rem;">Daily visits (last 7 days) · <strong id="currentViewsSpan">--</strong> views today</p><div id="liveChartArea" class="chart-line-container"></div><div id="updateTimer" style="text-align: center; margin-top: 1rem; font-size: 0.75rem; opacity: 0.7;">🔄 Refreshing in <span id="countdownSec">30</span> seconds</div></div></div>`;
+                drawChart(dataPoints);
+                let secs = 30;
+                const timerSpan = document.getElementById('countdownSec');
+                if (adminInterval) clearInterval(adminInterval);
+                adminInterval = setInterval(() => {
+                    secs--;
+                    if (timerSpan) timerSpan.innerText = secs;
+                    if (secs <= 0) {
+                        randomizeChart();
+                        secs = 30;
+                        if (timerSpan) timerSpan.innerText = "30";
                     }
-                    renderAuth();
-                }
-                updateHeaderAvatar();
-                document.querySelectorAll('#accountDynamicContent button').forEach(attachRipple);
+                }, 1000);
             }
             
-            // Sidebar controls
-            const overlayMenu = document.getElementById('overlayMenu');
-            const sidebarMenu = document.getElementById('sidebarMenu');
-            const hamburger = document.getElementById('hamburgerBtn');
-            const closeSidebar = document.getElementById('closeSidebarBtn');
+            // FIXED HOME BUTTON
+            homeBtn?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (adminInterval) { clearInterval(adminInterval); adminInterval = null; }
+                navigateTo('home');
+                showToast("🏠 Returned to Nexus Home");
+            });
             
+            // CAPTCHA Render (simplified, keeping original working)
+            let currentCaptchaSolution = null;
+            function generateCaptcha() { const types = ['sum', 'click']; const chosen = types[Math.floor(Math.random() * types.length)]; if (chosen === 'sum') { const a = Math.floor(Math.random() * 15) + 2; const b = Math.floor(Math.random() * 15) + 2; currentCaptchaSolution = a + b; return { html: `<div class="captcha-puzzle"><span class="captcha-question">🔐 ${a} + ${b} = ?</span><input type="text" id="captchaInput" class="captcha-input" placeholder="Answer"><button id="captchaVerifyBtn" class="captcha-btn">Verify</button></div>`, validator: (val) => parseInt(val) === currentCaptchaSolution }; } else { currentCaptchaSolution = 'clicked'; return { html: `<div class="captcha-puzzle"><span class="captcha-question">🖱️ Click to verify</span><button id="captchaClickBtn" class="captcha-btn">I'm not a robot 👆</button></div>`, validator: (val) => val === 'clicked' }; } }
+            function renderCaptcha(containerId, onSuccess) { const captchaData = generateCaptcha(); const captchaDiv = document.createElement('div'); captchaDiv.className = 'captcha-container'; captchaDiv.innerHTML = `<div style="margin-bottom: 0.3rem; font-size: 0.75rem;">🤖 <span style="font-weight: 600;">Verification</span></div>${captchaData.html}<div id="captchaStatus" style="font-size: 0.7rem; margin-top: 0.5rem; color: #f9a825;">⚠️ Please verify</div>`; const container = document.getElementById(containerId); if (container) { container.innerHTML = ''; container.appendChild(captchaDiv); } let resolved = false; const setValid = () => { if (!resolved) { resolved = true; const statusDiv = captchaDiv.querySelector('#captchaStatus'); if (statusDiv) { statusDiv.innerHTML = '✅ Verified successfully'; statusDiv.style.color = '#00c853'; } if (onSuccess) onSuccess(); } }; if (currentCaptchaSolution === 'clicked') { captchaDiv.querySelector('#captchaClickBtn')?.addEventListener('click', () => setValid()); } else if (typeof currentCaptchaSolution === 'number') { captchaDiv.querySelector('#captchaVerifyBtn')?.addEventListener('click', () => { const input = captchaDiv.querySelector('#captchaInput'); if (input && parseInt(input.value) === currentCaptchaSolution) setValid(); else { const st = captchaDiv.querySelector('#captchaStatus'); if (st) st.innerHTML = '❌ Wrong answer'; } }); } }
+            
+            function updateHeaderAvatar() { const img = document.getElementById('profileAvatarImg'); const placeholder = document.getElementById('avatarPlaceholder'); if (currentUser?.avatar) { img.src = currentUser.avatar; img.style.display = 'block'; placeholder.style.display = 'none'; } else { img.style.display = 'none'; placeholder.style.display = 'flex'; placeholder.textContent = currentUser?.username?.charAt(0) || '👤'; } }
+            function renderAccountSidebar() { const container = document.getElementById('accountDynamicContent'); if (!container) return; if (currentUser) { container.innerHTML = `<div style="display: flex; flex-direction: column; align-items: center; gap: 1rem;"><div id="avatarTrigger" style="width: 100px; height: 100px; border-radius: 100px; background: rgba(0,0,0,0.08); display: flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden;">${currentUser.avatar ? `<img src="${currentUser.avatar}" style="width: 100%; height: 100%; object-fit: cover;">` : `<span style="font-size: 3rem;">${currentUser.username?.charAt(0) || '👤'}</span>`}</div><input type="file" id="avatarUpload" accept="image/*" style="display: none;"><h3 style="font-weight: 700;">${currentUser.username}</h3><p style="font-size: 0.8rem; opacity: 0.8;">${currentUser.email} | ${currentUser.mobile}</p><button id="enableEditBtn" class="menu-action-btn" style="width: auto; padding: 0.5rem 1.2rem;">✎ Edit Profile</button><button id="logoutBtn" class="menu-action-btn" style="width: auto; padding: 0.5rem 1.2rem; background: rgba(224,90,90,0.2);">🚪 Logout</button><div id="editPanel" style="display: none; margin-top: 1rem; width: 100%;"><div class="input-group"><label>Username</label><input id="editUser" class="account-input" value="${currentUser.username}"></div><div class="input-group"><label>Email</label><input id="editEmail" class="account-input" value="${currentUser.email}"></div><div class="input-group"><label>Mobile</label><input id="editMobile" class="account-input" value="${currentUser.mobile}"></div><div class="input-group"><label>New Password</label><input id="editPass" type="password" class="account-input" placeholder="min 5 chars"></div><button id="saveEditBtn" class="btn-account">Save Changes</button></div></div>`; document.getElementById('avatarTrigger')?.addEventListener('click', () => document.getElementById('avatarUpload').click()); document.getElementById('avatarUpload')?.addEventListener('change', (e) => { const file = e.target.files[0]; if (file) { const reader = new FileReader(); reader.onload = (ev) => { currentUser.avatar = ev.target.result; saveCurrentUser(); renderAccountSidebar(); showToast("Avatar updated!"); }; reader.readAsDataURL(file); } }); document.getElementById('enableEditBtn')?.addEventListener('click', () => document.getElementById('editPanel').style.display = 'block'); document.getElementById('saveEditBtn')?.addEventListener('click', () => { const newUser = document.getElementById('editUser').value.trim(); const newEmail = document.getElementById('editEmail').value.trim(); const newMobile = document.getElementById('editMobile').value.trim(); const newPass = document.getElementById('editPass').value; if (!validateUsername(newUser)) { showToast("Username 3-20 chars", true); return; } if (!validateEmail(newEmail)) { showToast("Invalid email", true); return; } if (!validatePhone(newMobile)) { showToast("Invalid phone", true); return; } if (newPass && !validatePassword(newPass)) { showToast("Password: min 5 chars", true); return; } currentUser.username = newUser; currentUser.email = newEmail; currentUser.mobile = newMobile; if (newPass) currentUser.password = newPass; const idx = users.findIndex(u => u.id === currentUser.id); if (idx !== -1) users[idx] = { ...currentUser }; saveUsers(); saveCurrentUser(); showToast("Profile updated!"); renderAccountSidebar(); }); document.getElementById('logoutBtn')?.addEventListener('click', () => { currentUser = null; saveCurrentUser(); renderAccountSidebar(); closeAccountSidebar(); showToast("Logged out"); }); } else { let view = 'signin'; function renderAuth() { if (view === 'signin') { container.innerHTML = `<h3>Welcome back</h3><div class="account-form" id="signinForm"><div class="input-group"><label>Email or Mobile</label><input id="loginId" class="account-input"></div><div class="input-group"><label>Password</label><input id="loginPwd" type="password" class="account-input"></div><div id="captchaAnchorSignin"></div><button class="btn-account" id="doLogin">Sign In →</button><button class="toggle-auth" id="toSignup">✨ No account? Create</button><button class="toggle-auth" id="toRecover">🔐 Forgot password?</button></div>`; let captchaOk = false; renderCaptcha('captchaAnchorSignin', () => captchaOk = true); document.getElementById('doLogin')?.addEventListener('click', () => { if (!captchaOk) { showToast("Complete CAPTCHA first", true); return; } const id = document.getElementById('loginId').value.trim(); const pwd = document.getElementById('loginPwd').value; const user = users.find(u => (u.email === id || u.mobile === id) && u.password === pwd); if (user) { currentUser = user; saveCurrentUser(); showToast(`Welcome ${user.username}`); renderAccountSidebar(); closeAccountSidebar(); } else showToast("Invalid credentials", true); }); document.getElementById('toSignup')?.addEventListener('click', () => { view = 'signup'; renderAuth(); }); document.getElementById('toRecover')?.addEventListener('click', () => { view = 'recover'; renderAuth(); }); } else if (view === 'signup') { container.innerHTML = `<h3>Create account</h3><div class="account-form" id="signupForm"><div class="input-group"><label>Username (3-20)</label><input id="suName" class="account-input"></div><div class="input-group"><label>Mobile</label><input id="suMobile" class="account-input"></div><div class="input-group"><label>Email</label><input id="suEmail" class="account-input"></div><div class="input-group"><label>Password (min 5)</label><input id="suPwd" type="password" class="account-input"></div><div id="captchaAnchorSignup"></div><button class="btn-account" id="doSignup">Create →</button><button class="toggle-auth" id="backSignin">← Back</button></div>`; let captchaOk = false; renderCaptcha('captchaAnchorSignup', () => captchaOk = true); document.getElementById('doSignup')?.addEventListener('click', () => { if (!captchaOk) { showToast("Complete CAPTCHA", true); return; } const name = document.getElementById('suName').value.trim(); const mobile = document.getElementById('suMobile').value.trim(); const email = document.getElementById('suEmail').value.trim(); const pwd = document.getElementById('suPwd').value; if (!validateUsername(name) || !validatePhone(mobile) || !validateEmail(email) || !validatePassword(pwd)) { showToast("Invalid fields", true); return; } if (users.find(u => u.email === email) || users.find(u => u.mobile === mobile)) { showToast("Already exists", true); return; } const newUser = { username: name, mobile, email, password: pwd, id: Date.now().toString(), avatar: null }; users.push(newUser); saveUsers(); currentUser = newUser; saveCurrentUser(); showToast("Account created!"); renderAccountSidebar(); closeAccountSidebar(); }); document.getElementById('backSignin')?.addEventListener('click', () => { view = 'signin'; renderAuth(); }); } else { container.innerHTML = `<h3>Reset Password</h3><div class="account-form"><div class="input-group"><label>Email/Mobile</label><input id="recId" class="account-input"></div><div class="input-group"><label>New Password</label><input id="newPwdRec" type="password" class="account-input"></div><div id="captchaAnchorRecover"></div><button class="btn-account" id="resetPwdBtn">Reset</button><button class="toggle-auth" id="backRec">← Back</button></div>`; let captchaOk = false; renderCaptcha('captchaAnchorRecover', () => captchaOk = true); document.getElementById('resetPwdBtn')?.addEventListener('click', () => { if (!captchaOk) { showToast("CAPTCHA required", true); return; } const idf = document.getElementById('recId').value.trim(); const newP = document.getElementById('newPwdRec').value; const found = users.find(u => u.email === idf || u.mobile === idf); if (!found || !validatePassword(newP)) { showToast("Invalid", true); return; } found.password = newP; saveUsers(); showToast("Password reset!"); view = 'signin'; renderAuth(); }); document.getElementById('backRec')?.addEventListener('click', () => { view = 'signin'; renderAuth(); }); } } renderAuth(); } updateHeaderAvatar(); document.querySelectorAll('#accountDynamicContent button').forEach(attachRipple); }
+            
+            const overlayMenu = document.getElementById('overlayMenu'), sidebarMenu = document.getElementById('sidebarMenu'), hamburger = document.getElementById('hamburgerBtn'), closeSidebar = document.getElementById('closeSidebarBtn');
             function closeMenu() { sidebarMenu.classList.remove('open'); overlayMenu.classList.remove('active'); hamburger.classList.remove('active'); document.body.style.overflow = ''; }
             function openMenu() { sidebarMenu.classList.add('open'); overlayMenu.classList.add('active'); hamburger.classList.add('active'); document.body.style.overflow = 'hidden'; }
-            
             hamburger?.addEventListener('click', () => { if (sidebarMenu.classList.contains('open')) closeMenu(); else openMenu(); });
-            overlayMenu?.addEventListener('click', closeMenu);
-            closeSidebar?.addEventListener('click', closeMenu);
-            
-            const accountSidebar = document.getElementById('accountSidebar');
-            const overlayAccount = document.getElementById('overlayAccount');
-            const profileBtn = document.getElementById('profileAvatarBtn');
-            
+            overlayMenu?.addEventListener('click', closeMenu); closeSidebar?.addEventListener('click', closeMenu);
+            const accountSidebar = document.getElementById('accountSidebar'), overlayAccount = document.getElementById('overlayAccount'), profileBtn = document.getElementById('profileAvatarBtn');
             function openAccountSidebar() { accountSidebar.classList.add('open'); overlayAccount.classList.add('active'); document.body.style.overflow = 'hidden'; renderAccountSidebar(); }
             function closeAccountSidebar() { accountSidebar.classList.remove('open'); overlayAccount.classList.remove('active'); document.body.style.overflow = ''; }
-            
-            profileBtn?.addEventListener('click', openAccountSidebar);
-            document.getElementById('closeAccountSidebar')?.addEventListener('click', closeAccountSidebar);
-            overlayAccount?.addEventListener('click', closeAccountSidebar);
-            
-            // Theme
-            const body = document.body;
-            const themeBtn = document.getElementById('themeBtn');
-            const themeLabel = document.getElementById('themeLabel');
+            profileBtn?.addEventListener('click', openAccountSidebar); document.getElementById('closeAccountSidebar')?.addEventListener('click', closeAccountSidebar); overlayAccount?.addEventListener('click', closeAccountSidebar);
+            const body = document.body, themeBtn = document.getElementById('themeBtn'), themeLabel = document.getElementById('themeLabel');
             if (localStorage.getItem('dtl-theme') === 'dark') { body.classList.add('dark'); themeLabel.innerText = 'Dark'; }
             themeBtn?.addEventListener('click', () => { body.classList.toggle('dark'); localStorage.setItem('dtl-theme', body.classList.contains('dark') ? 'dark' : 'light'); themeLabel.innerText = body.classList.contains('dark') ? 'Dark' : 'Light'; });
-            
-            // Menu actions
             document.getElementById('teamActionBtn')?.addEventListener('click', () => { closeMenu(); navigateTo('team'); });
             document.getElementById('aiActionBtn')?.addEventListener('click', () => showToast("🚀 AI Nexus · coming soon"));
             document.getElementById('donateActionBtn')?.addEventListener('click', () => showToast("💖 Donate & Support · coming soon"));
-            
-            // Attach ripple
+            document.getElementById('adminActionBtn')?.addEventListener('click', () => { closeMenu(); navigateTo('admin'); });
             document.querySelectorAll('.theme-toggle, .profile-avatar, .hamburger, .card-item, .menu-action-btn, .close-btn, .btn-account, .toggle-auth').forEach(attachRipple);
-            
             navigateTo('home');
         })();
     </script>
 </body>
-</html>
 </html>
