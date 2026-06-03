@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Dark to Light · Nexus Ultimate · Live Production</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap');
+
+        :root {
+            --bg-light: #f0f3fc;
+            --bg-dark: #03050a;
+            --card-light: rgba(255,255,255,0.5);
+            --card-dark: rgba(10, 16, 28, 0.7);
+            --glass-light: rgba(250, 252, 255, 0.98);
+            --glass-dark: rgba(5, 8, 18, 0.98);
+            --accent: #5f8bff;
+            --accent-glow: rgba(95, 139, 255, 0.4);
+            --text-light: #1a253f;
+            --text-dark: #f0f5ff;
+            --transition-smooth: cubic-bezier(0.2, 0.9, 0.4, 1.2);
+        }
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--bg-light);
+            transition: background 0.6s var(--transition-smooth);
+            min-height: 100vh;
+            overflow-x: hidden;
+            color: var(--text-light);
+        }
+
+        body.dark {
+            background: var(--bg-dark);
+            color: var(--text-dark);
+        }
+
+        .bg-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            pointer-events: none;
+            z-index: 0;
+            animation: floatOrb 25s infinite alternate ease-in-out;
+        }
+        @keyframes floatOrb {
+            0% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+            100% { transform: translate(50px, -40px) scale(1.15); opacity: 0.8; }
+        }
+        body.dark .bg-orb { opacity: 0.3; }
+
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 2rem 3rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0 1rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+            animation: slideDown 0.8s var(--transition-smooth);
+        }
+        @keyframes slideDown {
+            0% { opacity: 0; transform: translateY(-50px) scale(0.98); filter: blur(6px); }
+            100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+        }
+
+        .logo {
+            font-size: 2.1rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            background: linear-gradient(135deg, #141f33, #2d4270, #4a6ea8, #5f8bff);
+            background-size: 300% 300%;
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            animation: logoShimmer 4s infinite alternate;
+            transition: all 0.3s;
+        }
+        @keyframes logoShimmer {
+            0% { background-position: 0% 50%; filter: drop-shadow(0 0 2px rgba(95,139,255,0.3)); }
+            100% { background-position: 100% 50%; filter: drop-shadow(0 0 10px rgba(95,139,255,0.6)); }
+        }
+        body.dark .logo {
+            background: linear-gradient(135deg, #eef5ff, #c7ddff, #aac2ff, #eef5ff);
+            background-size: 300% 300%;
+            background-clip: text;
+            text-shadow: 0 0 15px rgba(167, 199, 255, 0.8);
+        }
+
+        .light-badge {
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.2rem 0.8rem;
+            background: rgba(0,0,0,0.05);
+            border-radius: 40px;
+            transition: all 0.3s;
+        }
+        body.dark .light-badge {
+            background: rgba(255,255,255,0.12);
+            color: #c7ddff;
+            box-shadow: 0 0 12px rgba(95,139,255,0.8);
+            text-shadow: 0 0 5px #5f8bff;
+        }
+
+        .profile-avatar {
+            width: 54px;
+            height: 54px;
+            border-radius: 60px;
+            background: rgba(235, 242, 255, 0.7);
+            backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.4s var(--transition-smooth);
+            border: 1.5px solid rgba(255,255,255,0.6);
+            overflow: hidden;
+            animation: avatarGlow 3s infinite;
+        }
+        @keyframes avatarGlow {
+            0% { box-shadow: 0 0 0 0 rgba(95,139,255,0.4); }
+            70% { box-shadow: 0 0 0 8px rgba(95,139,255,0); }
+            100% { box-shadow: 0 0 0 0 rgba(95,139,255,0); }
+        }
+        body.dark .profile-avatar {
+            background: rgba(30, 45, 80, 0.8);
+            border: 1.5px solid rgba(95,139,255,0.6);
+            box-shadow: 0 0 12px rgba(95,139,255,0.5);
+        }
+        .profile-avatar:hover { transform: scale(1.08) rotate(3deg); animation: none; }
+
+        .theme-toggle {
+            background: rgba(230, 238, 255, 0.7);
+            backdrop-filter: blur(12px);
+            border: none;
+            padding: 0.7rem 1.3rem;
+            border-radius: 100px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.4s var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+            color: #1f2b44;
+        }
+        body.dark .theme-toggle {
+            background: rgba(50, 70, 120, 0.8);
+            color: #eef3ff;
+            box-shadow: 0 0 12px rgba(95,139,255,0.6);
+            text-shadow: 0 0 4px #5f8bff;
+        }
+        .theme-toggle:hover { transform: scale(1.05) translateY(-3px); box-shadow: 0 12px 28px -12px rgba(0,0,0,0.3); }
+
+        .hamburger {
+            width: 52px;
+            height: 52px;
+            border-radius: 30px;
+            background: rgba(235, 242, 255, 0.7);
+            backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 7px;
+            cursor: pointer;
+            transition: all 0.4s var(--transition-smooth);
+            border: none;
+            position: relative;
+            overflow: hidden;
+        }
+        body.dark .hamburger {
+            background: rgba(50, 70, 120, 0.8);
+            box-shadow: 0 0 10px rgba(95,139,255,0.5);
+        }
+        .hamburger:hover { transform: scale(0.95); gap: 8px; }
+        .hamburger span {
+            display: block;
+            width: 28px;
+            height: 2.5px;
+            background: #1f2b44;
+            border-radius: 10px;
+            transition: all 0.5s cubic-bezier(0.68, -0.6, 0.32, 1.6);
+        }
+        body.dark .hamburger span { background: #eef3ff; box-shadow: 0 0 4px #5f8bff; }
+        .hamburger.active span:nth-child(1) { transform: translateY(9.5px) rotate(45deg); }
+        .hamburger.active span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+        .hamburger.active span:nth-child(3) { transform: translateY(-9.5px) rotate(-45deg); }
+
+        .sidebar, .account-sidebar { transition: left 0.6s var(--transition-smooth), right 0.6s var(--transition-smooth); }
+        .sidebar {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 360px;
+            max-width: 85vw;
+            height: 100vh;
+            background: var(--glass-light);
+            backdrop-filter: blur(40px);
+            z-index: 2000;
+            padding: 2rem;
+            border-left: 1px solid rgba(255,255,255,0.5);
+        }
+        body.dark .sidebar { background: var(--glass-dark); border-left: 1px solid rgba(80,120,200,0.3); box-shadow: -5px 0 25px rgba(95,139,255,0.2); }
+        .sidebar.open { right: 0; }
+
+        .account-sidebar {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 520px;
+            max-width: 92vw;
+            height: 100vh;
+            background: var(--glass-light);
+            backdrop-filter: blur(40px);
+            z-index: 2100;
+            padding: 2rem 1.8rem;
+            overflow-y: auto;
+            border-right: 1px solid rgba(255,255,255,0.5);
+        }
+        body.dark .account-sidebar { background: var(--glass-dark); border-right: 1px solid rgba(80,120,200,0.3); box-shadow: 5px 0 25px rgba(95,139,255,0.2); }
+        .account-sidebar.open { left: 0; }
+
+        .overlay-menu, .overlay-account {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s;
+        }
+        .overlay-menu { background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(8px); }
+        .overlay-account { background: rgba(0, 0, 0, 0.35); backdrop-filter: blur(6px); z-index: 2099; }
+        .overlay-menu.active, .overlay-account.active { opacity: 1; visibility: visible; }
+
+        .grid-cards {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2rem;
+            margin: 4rem 0 2rem;
+        }
+        .card-item {
+            background: var(--card-light);
+            backdrop-filter: blur(12px);
+            border-radius: 2rem;
+            padding: 1.8rem;
+            width: 210px;
+            text-align: center;
+            transition: all 0.5s var(--transition-smooth);
+            border: 1px solid rgba(255,255,255,0.3);
+            cursor: pointer;
+            animation: cardReveal 0.8s backwards;
+        }
+        body.dark .card-item { background: var(--card-dark); border: 1px solid rgba(255,255,255,0.15); box-shadow: 0 8px 20px rgba(95,139,255,0.2); }
+        body.dark .card-item div { color: #eef3ff; text-shadow: 0 0 6px #5f8bff; }
+        .card-item:hover { transform: translateY(-15px) scale(1.03); box-shadow: 0 35px 45px -20px rgba(0,0,0,0.3); }
+        @keyframes cardReveal {
+            from { opacity: 0; transform: translateY(50px) scale(0.95); filter: blur(6px); }
+            to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+        }
+        .card-item:nth-child(1) { animation-delay: 0.05s; }
+        .card-item:nth-child(2) { animation-delay: 0.15s; }
+        .card-item:nth-child(3) { animation-delay: 0.25s; }
+
+        .hero {
+            margin-top: 3.5rem;
+            text-align: center;
+            animation: heroMorph 1s var(--transition-smooth);
+        }
+        @keyframes heroMorph {
+            0% { opacity: 0; transform: translateY(60px) scale(0.96); filter: blur(8px); }
+            100% { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+        }
+        .hero-title {
+            font-size: clamp(2.5rem, 9vw, 4.8rem);
+            font-weight: 800;
+            background: linear-gradient(130deg, #1f2c46, #2a4170, #3f5a8c, #5f8bff);
+            background-size: 300% 300%;
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            animation: gradientShift 6s infinite alternate;
+        }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+        body.dark .hero-title {
+            background: linear-gradient(130deg, #f0f5ff, #c7ddff, #aac2ff, #eef5ff);
+            background-size: 300% 300%;
+            background-clip: text;
+            text-shadow: 0 0 20px rgba(167, 199, 255, 0.9);
+        }
+        body.dark .hero-desc {
+            color: #eef3ff;
+            text-shadow: 0 0 8px #5f8bff;
+        }
+
+        .account-form { display: flex; flex-direction: column; gap: 1.2rem; }
+        .input-group { display: flex; flex-direction: column; gap: 0.4rem; }
+        .input-group label { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; opacity: 0.7; }
+        body.dark .input-group label { color: #c7ddff; text-shadow: 0 0 3px #5f8bff; }
+        .account-input {
+            background: rgba(230, 238, 255, 0.4);
+            border: 1px solid rgba(0,0,0,0.08);
+            border-radius: 28px;
+            padding: 1rem 1.3rem;
+            font-size: 0.95rem;
+            transition: all 0.3s var(--transition-smooth);
+            font-family: 'Inter', monospace;
+        }
+        body.dark .account-input {
+            background: rgba(20, 35, 60, 0.6);
+            border: 1px solid rgba(95,139,255,0.4);
+            color: #eef3ff;
+            box-shadow: inset 0 0 5px rgba(95,139,255,0.2);
+        }
+        .account-input:focus {
+            transform: scale(1.02);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 5px rgba(95, 139, 255, 0.25);
+            background: rgba(255,255,255,0.7);
+            outline: none;
+        }
+        body.dark .account-input:focus { background: rgba(40, 60, 100, 0.8); box-shadow: 0 0 0 5px rgba(95,139,255,0.4); }
+
+        .btn-account {
+            background: linear-gradient(135deg, #1f2b44, #2d4270);
+            border: none;
+            padding: 1rem;
+            border-radius: 60px;
+            font-weight: 700;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+        body.dark .btn-account {
+            background: linear-gradient(135deg, #2a3d6e, #3f5a8c);
+            box-shadow: 0 0 12px rgba(95,139,255,0.6);
+            text-shadow: 0 0 4px white;
+        }
+        .btn-account:hover { transform: translateY(-3px); box-shadow: 0 12px 25px -8px rgba(0,0,0,0.3); }
+        .toggle-auth {
+            background: transparent;
+            border: none;
+            color: #3f5582;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.8rem;
+            text-decoration: underline;
+            padding: 0.5rem;
+            transition: all 0.2s;
+        }
+        .toggle-auth:hover { opacity: 0.8; transform: translateX(2px); }
+        body.dark .toggle-auth { color: #9eb9ff; text-shadow: 0 0 8px rgba(95,139,255,0.8); }
+
+        .ripple-effect {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,245,0.9), rgba(200,220,255,0.5));
+            transform: scale(0);
+            animation: rippleDrop 0.7s var(--transition-smooth) forwards;
+            pointer-events: none;
+        }
+        @keyframes rippleDrop {
+            0% { transform: scale(0); opacity: 0.8; }
+            50% { transform: scale(1); opacity: 0.5; }
+            100% { transform: scale(3); opacity: 0; }
+        }
+        body.dark .ripple-effect {
+            background: radial-gradient(circle, rgba(180,210,255,0.9), rgba(100,150,240,0.6));
+        }
+
+        .toast-msg {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(30px);
+            background: rgba(20, 30, 55, 0.96);
+            backdrop-filter: blur(32px);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 80px;
+            font-weight: 500;
+            z-index: 3100;
+            opacity: 0;
+            transition: all 0.3s var(--transition-smooth);
+            pointer-events: none;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+        body.dark .toast-msg {
+            background: rgba(95,139,255,0.9);
+            box-shadow: 0 0 20px #5f8bff;
+            color: #03050a;
+            font-weight: bold;
+        }
+        .toast-msg.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+        .menu-action-btn {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 60px;
+            background: rgba(230,240,255,0.8);
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s var(--transition-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+        .menu-action-btn:hover { transform: translateY(-4px); background: rgba(255,255,255,0.9); }
+        body.dark .menu-action-btn { background: rgba(30,45,75,0.9); color: #eaf2ff; box-shadow: 0 0 8px rgba(95,139,255,0.5); }
+        body.dark .menu-action-btn:hover { background: #2a4170; box-shadow: 0 0 15px #5f8bff; }
+
+        body.dark .footer-note { color: #c7ddff; text-shadow: 0 0 5px #5f8bff; }
+    </style>
+</head>
+<body>
+    <div class="bg-orb" style="top: -20%; left: -10%; width: 600px; height: 600px; background: radial-gradient(circle, rgba(95,139,255,0.25), transparent);"></div>
+    <div class="bg-orb" style="bottom: -15%; right: -5%; width: 700px; height: 700px; background: radial-gradient(circle, rgba(140,180,250,0.2), transparent); animation-delay: -5s;"></div>
+
+    <div class="main-container">
+        <div class="header">
+            <div class="logo-area"><span class="logo">Dark to Light.</span><span class="light-badge">premium nexus</span></div>
+            <div style="display: flex; gap: 1rem; align-items: center;">
+                <div class="profile-avatar" id="profileAvatarBtn">
+                    <div class="avatar-placeholder" id="avatarPlaceholder" style="font-size:1.8rem;">👤</div>
+                    <img id="profileAvatarImg" style="display: none; width:100%; height:100%; object-fit:cover;">
+                </div>
+                <button class="theme-toggle" id="themeBtn"><span>🌓</span> <span id="themeLabel">Light</span></button>
+                <button class="hamburger" id="hamburgerBtn"><span></span><span></span><span></span></button>
+            </div>
+        </div>
+        <div class="hero">
+            <h1 class="hero-title">from shadow to radiance</h1>
+            <p class="hero-desc" style="margin-top:1rem; opacity:0.75;">Infinite fluid · Premium verification · Global secure system</p>
+            <div class="grid-cards">
+                <div class="card-item"><div style="font-size:2.5rem;">✦</div><div style="font-weight:600; margin-top:0.5rem;">Luminary</div></div>
+                <div class="card-item"><div style="font-size:2.5rem;">◈</div><div style="font-weight:600; margin-top:0.5rem;">Noctis</div></div>
+                <div class="card-item"><div style="font-size:2.5rem;">○</div><div style="font-weight:600; margin-top:0.5rem;">Aether</div></div>
+            </div>
+        </div>
+        <div class="footer-note" style="text-align:center; opacity:0.5; margin-top:2rem;">Dark ↔ Light · Radiant Text · Advanced Ripple Ecosystem</div>
+    </div>
+
+    <div class="overlay-menu" id="overlayMenu"></div>
+    <div class="sidebar" id="sidebarMenu">
+        <div style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2rem;">
+            <div style="text-align:center;"><div style="font-size:3rem;">✨</div><div style="font-weight:600;">Portal</div><div style="font-size:0.7rem;">AI & Donation Hub</div></div>
+            <button class="menu-action-btn" id="aiActionBtn">🤖 AI · Intelligence</button>
+            <button class="menu-action-btn" id="donateActionBtn">❤️ Donate & Support</button>
+            <button id="closeSidebarBtn" style="background:rgba(0,0,0,0.05); border:none; padding:0.6rem 1.2rem; border-radius:40px; cursor:pointer;">✕ Close</button>
+        </div>
+    </div>
+
+    <div class="overlay-account" id="overlayAccount"></div>
+    <div class="account-sidebar" id="accountSidebar">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:2rem;">
+            <span style="font-weight:800; font-size:1.4rem;">🌟 Nexus Account</span>
+            <button id="closeAccountSidebar" style="background:rgba(0,0,0,0.05); border:none; width:38px; height:38px; border-radius:40px; cursor:pointer;">✕</button>
+        </div>
+        <div id="accountDynamicContent"></div>
+    </div>
+
+    <div id="toastMessage" class="toast-msg">✨ Premium system ready</div>
+
+    <script>
+        (function(){
+            function addRipple(e, el) {
+                const rect = el.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const ripple = document.createElement('span');
+                ripple.className = 'ripple-effect';
+                ripple.style.position = 'absolute';
+                ripple.style.left = `${x}px`;
+                ripple.style.top = `${y}px`;
+                ripple.style.width = `${size}px`;
+                ripple.style.height = `${size}px`;
+                el.style.position = 'relative';
+                el.appendChild(ripple);
+                setTimeout(() => ripple.remove(), 700);
+            }
+            function attachRipple(el) { if(el && !el._rippled) { el.addEventListener('click', (e) => addRipple(e, el)); el._rippled = true; } }
+
+            let users = JSON.parse(localStorage.getItem('dtl_users')) || [];
+            let currentUser = JSON.parse(localStorage.getItem('dtl_currentUser')) || null;
+            function saveUsers() { localStorage.setItem('dtl_users', JSON.stringify(users)); }
+            function saveCurrentUser() { localStorage.setItem('dtl_currentUser', JSON.stringify(currentUser)); }
+
+            function validateEmail(email) { return /^[^\s@]+@[^\s@]+\.(com|org|net|io|co)$/i.test(email); }
+            function validatePhone(phone) { 
+                return /^(\+1[0-9]{10}|\+44[0-9]{10}|\+81[0-9]{10}|\+98[0-9]{10}|[0-9]{10,13})$/.test(phone) || /^[0-9]{10,13}$/.test(phone);
+            }
+            function validatePassword(pwd) { return /^[A-Za-z0-9]{5,}$/.test(pwd); }
+            function validateUsername(name) { return name.length >= 3 && name.length <= 20; }
+
+            function showToast(msg, isErr=false) {
+                const toast = document.getElementById('toastMessage');
+                toast.textContent = msg;
+                toast.classList.add('show');
+                if(window.toastTimeout) clearTimeout(window.toastTimeout);
+                window.toastTimeout = setTimeout(() => toast.classList.remove('show'), 2500);
+            }
+
+            function renderAccountSidebar() {
+                const container = document.getElementById('accountDynamicContent');
+                if(!container) return;
+                
+                if(currentUser) {
+                    container.innerHTML = `
+                        <div style="display:flex; flex-direction:column; align-items:center; gap:1.2rem;">
+                            <div id="avatarTrigger" style="width:110px; height:110px; border-radius:100px; background:rgba(0,0,0,0.08); display:flex; align-items:center; justify-content:center; cursor:pointer; overflow:hidden; transition:0.2s;">
+                                ${currentUser.avatar ? `<img src="${currentUser.avatar}" style="width:100%;height:100%;object-fit:cover;">` : `<span style="font-size:3.5rem;">${currentUser.username?.charAt(0) || '👤'}</span>`}
+                            </div>
+                            <input type="file" id="avatarUpload" accept="image/*" style="display:none">
+                            <h3 style="font-weight:800; font-size:1.4rem;">${currentUser.username}</h3>
+                            <p style="font-size:0.85rem; opacity:0.8;">${currentUser.email} | ${currentUser.mobile}</p>
+                            <button id="enableEditBtn" style="padding:0.5rem 1.2rem; border-radius:40px; background:rgba(0,0,0,0.05); border:none; cursor:pointer;">✎ Edit Profile</button>
+                            <button id="logoutBtn" style="padding:0.5rem 1.2rem; border-radius:40px; background:#e05a5a20; border:none; cursor:pointer;">🚪 Logout</button>
+                        </div>
+                        <div id="editPanel" style="display:none; margin-top:1.8rem;">
+                            <div class="input-group"><label>Username</label><input id="editUser" class="account-input" value="${currentUser.username}"></div>
+                            <div class="input-group"><label>Email</label><input id="editEmail" class="account-input" value="${currentUser.email}"></div>
+                            <div class="input-group"><label>Mobile</label><input id="editMobile" class="account-input" value="${currentUser.mobile}"></div>
+                            <div class="input-group"><label>New Password</label><input id="editPass" type="password" class="account-input" placeholder="min 5 chars letters/numbers"></div>
+                            <button class="btn-account" id="saveEditBtn">Save Changes</button>
+                        </div>
+                    `;
+                    document.getElementById('avatarTrigger')?.addEventListener('click', () => document.getElementById('avatarUpload').click());
+                    document.getElementById('avatarUpload')?.addEventListener('change', (e) => {
+                        const file = e.target.files[0];
+                        if(file) { const reader = new FileReader(); reader.onload = (ev) => { currentUser.avatar = ev.target.result; saveCurrentUser(); renderAccountSidebar(); showToast("Avatar updated!"); }; reader.readAsDataURL(file); }
+                    });
+                    document.getElementById('enableEditBtn')?.addEventListener('click', () => document.getElementById('editPanel').style.display = 'block');
+                    document.getElementById('saveEditBtn')?.addEventListener('click', () => {
+                        const newUser = document.getElementById('editUser').value.trim();
+                        const newEmail = document.getElementById('editEmail').value.trim();
+                        const newMobile = document.getElementById('editMobile').value.trim();
+                        const newPass = document.getElementById('editPass').value;
+                        if(!validateUsername(newUser)) { showToast("Username 3-20 chars", true); return; }
+                        if(!validateEmail(newEmail)) { showToast("Invalid email (must contain @ and .com)", true); return; }
+                        if(!validatePhone(newMobile)) { showToast("Invalid phone number", true); return; }
+                        if(newPass && !validatePassword(newPass)) { showToast("Password: min 5 chars, letters/numbers only", true); return; }
+                        currentUser.username = newUser; currentUser.email = newEmail; currentUser.mobile = newMobile;
+                        if(newPass) currentUser.password = newPass;
+                        const idx = users.findIndex(u => u.id === currentUser.id);
+                        if(idx !== -1) users[idx] = {...currentUser};
+                        saveUsers(); saveCurrentUser();
+                        showToast("Profile updated!"); renderAccountSidebar();
+                    });
+                    document.getElementById('logoutBtn')?.addEventListener('click', () => { currentUser = null; saveCurrentUser(); renderAccountSidebar(); closeAccountSidebar(); showToast("Logged out"); });
+                } else {
+                    let view = 'signin';
+                    
+                    function renderAuth() {
+                        if(view === 'signin') {
+                            container.innerHTML = `<h3 style="margin-bottom:1rem;">Welcome back</h3><div class="account-form"><div class="input-group"><label>Email or Mobile</label><input id="loginId" class="account-input" placeholder="email@example.com or +1234567890"></div><div class="input-group"><label>Password</label><input id="loginPwd" type="password" class="account-input"></div><button class="btn-account" id="doLogin">Sign In →</button><button class="toggle-auth" id="toSignup">✨ No account? Create</button><button class="toggle-auth" id="toRecover">🔐 Forgot password?</button></div>`;
+                            document.getElementById('doLogin')?.addEventListener('click', () => {
+                                const id = document.getElementById('loginId').value.trim();
+                                const pwd = document.getElementById('loginPwd').value;
+                                const user = users.find(u => (u.email === id || u.mobile === id) && u.password === pwd);
+                                if(user) { currentUser = user; saveCurrentUser(); showToast(`Welcome ${user.username}`); renderAccountSidebar(); closeAccountSidebar(); }
+                                else showToast("Invalid credentials", true);
+                            });
+                            document.getElementById('toSignup')?.addEventListener('click', () => { view = 'signup'; renderAuth(); });
+                            document.getElementById('toRecover')?.addEventListener('click', () => { view = 'recover'; renderAuth(); });
+                        } 
+                        else if(view === 'signup') {
+                            container.innerHTML = `<h3>Create account</h3><div class="account-form"><div class="input-group"><label>Username (3-20 chars)</label><input id="suName" class="account-input"></div><div class="input-group"><label>Mobile (International)</label><input id="suMobile" class="account-input" placeholder="+19876543210 or 09123456789"></div><div class="input-group"><label>Email (must contain @ and .com)</label><input id="suEmail" class="account-input" type="email"></div><div class="input-group"><label>Password (min 5, letters/numbers)</label><input id="suPwd" type="password" class="account-input"></div><button class="btn-account" id="doSignup">Create Account →</button><button class="toggle-auth" id="backSignin">← Back to Sign in</button></div>`;
+                            document.getElementById('doSignup')?.addEventListener('click', () => {
+                                const name = document.getElementById('suName').value.trim();
+                                const mobile = document.getElementById('suMobile').value.trim();
+                                const email = document.getElementById('suEmail').value.trim();
+                                const pwd = document.getElementById('suPwd').value;
+                                if(!validateUsername(name)) { showToast("Username 3-20 characters", true); return; }
+                                if(!validatePhone(mobile)) { showToast("Invalid phone number", true); return; }
+                                if(!validateEmail(email)) { showToast("Email must contain @ and .com", true); return; }
+                                if(!validatePassword(pwd)) { showToast("Password: min 5 chars, only letters & numbers", true); return; }
+                                if(users.find(u => u.email === email || u.mobile === mobile)) { showToast("User already exists", true); return; }
+                                const newUser = { username: name, mobile, email, password: pwd, id: Date.now().toString(), avatar: null };
+                                users.push(newUser); saveUsers(); currentUser = newUser; saveCurrentUser();
+                                showToast("Account created successfully!"); renderAccountSidebar(); closeAccountSidebar();
+                            });
+                            document.getElementById('backSignin')?.addEventListener('click', () => { view = 'signin'; renderAuth(); });
+                        }
+                        else if(view === 'recover') {
+                            container.innerHTML = `<h3>Reset Password</h3><div class="account-form"><div class="input-group"><label>Email or Mobile</label><input id="recId" class="account-input" placeholder="Enter your email or mobile"></div><div class="input-group"><label>New Password (min 5 letters/numbers)</label><input id="newPwdRec" type="password" class="account-input"></div><button class="btn-account" id="resetPwdBtn">Reset Password →</button><button class="toggle-auth" id="backRec">← Back to Sign in</button></div>`;
+                            document.getElementById('resetPwdBtn')?.addEventListener('click', () => {
+                                const idf = document.getElementById('recId').value.trim();
+                                const newP = document.getElementById('newPwdRec').value;
+                                const foundUser = users.find(u => u.email === idf || u.mobile === idf);
+                                if(!foundUser) { showToast("Account not found", true); return; }
+                                if(!validatePassword(newP)) { showToast("Password: min 5 chars, letters/numbers only", true); return; }
+                                foundUser.password = newP;
+                                saveUsers();
+                                showToast("Password reset successfully! Please sign in.");
+                                view = 'signin';
+                                renderAuth();
+                            });
+                            document.getElementById('backRec')?.addEventListener('click', () => { view = 'signin'; renderAuth(); });
+                        }
+                        document.querySelectorAll('#accountDynamicContent button').forEach(attachRipple);
+                    }
+                    renderAuth();
+                }
+                document.querySelectorAll('#accountDynamicContent button, #accountDynamicContent #avatarTrigger').forEach(attachRipple);
+            }
+
+            const overlayMenu = document.getElementById('overlayMenu');
+            const sidebarMenu = document.getElementById('sidebarMenu');
+            const hamburger = document.getElementById('hamburgerBtn');
+            const closeSidebar = document.getElementById('closeSidebarBtn');
+            function closeMenu() { sidebarMenu.classList.remove('open'); overlayMenu.classList.remove('active'); hamburger.classList.remove('active'); document.body.style.overflow = ''; }
+            function openMenu() { sidebarMenu.classList.add('open'); overlayMenu.classList.add('active'); hamburger.classList.add('active'); document.body.style.overflow = 'hidden'; }
+            hamburger?.addEventListener('click', () => { if(sidebarMenu.classList.contains('open')) closeMenu(); else openMenu(); });
+            overlayMenu?.addEventListener('click', closeMenu);
+            closeSidebar?.addEventListener('click', closeMenu);
+
+            const accountSidebar = document.getElementById('accountSidebar');
+            const overlayAccount = document.getElementById('overlayAccount');
+            const profileBtn = document.getElementById('profileAvatarBtn');
+            function openAccountSidebar() { accountSidebar.classList.add('open'); overlayAccount.classList.add('active'); document.body.style.overflow = 'hidden'; renderAccountSidebar(); }
+            function closeAccountSidebar() { accountSidebar.classList.remove('open'); overlayAccount.classList.remove('active'); document.body.style.overflow = ''; }
+            profileBtn?.addEventListener('click', openAccountSidebar);
+            document.getElementById('closeAccountSidebar')?.addEventListener('click', closeAccountSidebar);
+            overlayAccount?.addEventListener('click', closeAccountSidebar);
+
+            function updateHeaderAvatar() {
+                const img = document.getElementById('profileAvatarImg');
+                const placeholder = document.getElementById('avatarPlaceholder');
+                if(currentUser?.avatar) { img.src = currentUser.avatar; img.style.display = 'block'; placeholder.style.display = 'none'; }
+                else { img.style.display = 'none'; placeholder.style.display = 'flex'; placeholder.textContent = currentUser?.username?.charAt(0) || '👤'; }
+            }
+            const origRender = renderAccountSidebar;
+            renderAccountSidebar = function() { origRender(); updateHeaderAvatar(); };
+            updateHeaderAvatar();
+
+            const body = document.body;
+            const themeBtn = document.getElementById('themeBtn');
+            const themeLabel = document.getElementById('themeLabel');
+            if(localStorage.getItem('dtl-theme') === 'dark') { body.classList.add('dark'); themeLabel.innerText = 'Dark'; }
+            themeBtn?.addEventListener('click', () => { body.classList.toggle('dark'); localStorage.setItem('dtl-theme', body.classList.contains('dark') ? 'dark' : 'light'); themeLabel.innerText = body.classList.contains('dark') ? 'Dark' : 'Light'; });
+
+            document.getElementById('aiActionBtn')?.addEventListener('click', () => showToast("🚀 AI Nexus · coming soon"));
+            document.getElementById('donateActionBtn')?.addEventListener('click', () => showToast("💖 Donate & Support · coming soon"));
+
+            document.querySelectorAll('.theme-toggle, .profile-avatar, .hamburger, .card-item, .menu-action-btn, #closeSidebarBtn, #closeAccountSidebar').forEach(attachRipple);
+            document.querySelectorAll('.card-item').forEach(attachRipple);
+        })();
+    </script>
+</body>
+</html>
