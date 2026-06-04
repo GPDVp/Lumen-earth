@@ -903,7 +903,8 @@
         const EMAILJS_CONFIG = {
             publicKey: 'uyvXTp97rEHmz-Ps1',
             serviceId: 'service_vebcbtu',
-            templateId: 'template_u37gpkp'
+            userTemplateId: 'template_u37gpkp',    // قالب کاربر (خوش‌آمدگویی)
+            adminTemplateId: 'template_m4ouv2x'    // قالب مدیر (گزارش)
         };
         
         if (typeof emailjs !== 'undefined') {
@@ -912,7 +913,7 @@
         }
         
         // ============================================
-        // تابع ارسال ایمیل
+        // تابع ارسال ایمیل (هم به کاربر، هم به مدیر)
         // ============================================
         async function sendRealEmail(toEmail, type, username) {
             if (!toEmail || toEmail === '') {
@@ -920,24 +921,35 @@
                 return false;
             }
             
-            const templateParams = {
+            // ========== ایمیل اول: به کاربر (خوش‌آمدگویی) ==========
+            const userTemplateParams = {
                 to_email: toEmail,
                 username: username,
-                type: type === 'signup' ? 'Account Created' : 'New Sign-in',
+                type: type === 'signup' ? '✨ Welcome to Lumen Eath' : '🔐 You logged in',
                 time: new Date().toLocaleString('en-US')
             };
             
+            // ========== ایمیل دوم: به مدیر (گزارش جداگانه) ==========
+            const adminTemplateParams = {
+                to_email: "Lumenearthstudio@gmail.com",
+                username: username,
+                user_email: toEmail,
+                type: type === 'signup' ? '🆕 NEW USER SIGNUP' : '👤 USER LOGIN',
+                time: new Date().toLocaleString('fa-IR', { hour12: false })
+            };
+            
             try {
-                const response = await emailjs.send(
-                    EMAILJS_CONFIG.serviceId,
-                    EMAILJS_CONFIG.templateId,
-                    templateParams
-                );
-                console.log('✅ Email sent!', response);
-                showToast(`📧 Welcome email sent to ${toEmail}`);
+                // ارسال هر دو ایمیل با هم
+                await Promise.all([
+                    emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.userTemplateId, userTemplateParams),
+                    emailjs.send(EMAILJS_CONFIG.serviceId, EMAILJS_CONFIG.adminTemplateId, adminTemplateParams)
+                ]);
+                console.log('✅ هر دو ایمیل فرستاده شد - کاربر و مدیر');
+                showToast(`📧 ایمیل خوش‌آمدگویی به ${toEmail} فرستاده شد`);
                 return true;
             } catch(error) {
-                console.error('❌ Email error:', error);
+                console.error('❌ خطا:', error);
+                showToast(`⚠️ خطا در ارسال ایمیل: ${error.text || 'مشخص نیست'}`);
                 return false;
             }
         }
@@ -1374,7 +1386,7 @@
         document.querySelectorAll('.theme-toggle, .profile-avatar, .hamburger, .card-item, .menu-action-btn, .close-btn, .btn-account, .toggle-auth').forEach(attachRipple);
         navigateTo('home');
         
-        console.log('🚀 Site loaded with Rich CAPTCHA and Admin Stats');
+        console.log('🚀 Site loaded with Rich CAPTCHA and Dual Email System (User + Admin)');
     </script>
 </body>
 </html>
