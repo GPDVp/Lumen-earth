@@ -689,6 +689,28 @@
             color: #eef3ff;
         }
 
+        /* CAPTCHA Cards Style */
+        .captcha-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.6rem;
+            margin: 0.5rem 0;
+        }
+        .captcha-card {
+            background: rgba(95,139,255,0.1);
+            border-radius: 0.8rem;
+            padding: 0.6rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 2px solid transparent;
+        }
+        .captcha-card:hover { transform: scale(0.98); background: rgba(95,139,255,0.2); }
+        .captcha-card.selected { border-color: var(--success); background: rgba(0,200,83,0.15); }
+        .captcha-card.wrong { border-color: var(--error); background: rgba(255,82,82,0.15); }
+        .captcha-emoji { font-size: 1.8rem; }
+        .captcha-text { font-size: 0.7rem; margin-top: 0.2rem; }
+
         .toast-msg {
             position: fixed;
             bottom: 30px;
@@ -764,6 +786,31 @@
         body.dark .donation-amount {
             background: rgba(95,139,255,0.15);
         }
+
+        /* Admin Accounts Stats */
+        .stats-dashboard {
+            background: linear-gradient(135deg, rgba(95,139,255,0.1), rgba(0,0,0,0.05));
+            border-radius: 1.5rem;
+            padding: 1.2rem;
+            margin: 1rem 0;
+            text-align: center;
+        }
+        .stats-number {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #5f8bff, #aac2ff);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+        .stats-label {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            letter-spacing: 1px;
+        }
+        .admin-chart-container {
+            margin: 1rem 0;
+        }
     </style>
 </head>
 <body>
@@ -816,7 +863,7 @@
         <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2rem;">
             <div style="text-align: center;"><div style="font-size: 3rem;">✨</div><div style="font-weight: 600;">Portal</div></div>
             <button class="menu-action-btn" id="teamActionBtn">👥 Our Team</button>
-            <button class="menu-action-btn" id="aiActionBtn">🤖 AI · Intelligence</button>
+            <button class="menu-action-btn" id="aiActionBtn">🤖 AI · DeepSeek Intelligence</button>
             <button class="menu-action-btn" id="donateActionBtn">❤️ Donate & Support</button>
             <button class="menu-action-btn" id="adminActionBtn">🛡️ Admins & Management</button>
             <button id="closeSidebarBtn" class="close-btn" style="width: auto; padding: 0.6rem 1.5rem;">✕ Close</button>
@@ -896,6 +943,99 @@
         }
 
         // ============================================
+        // CAPTCHA با تنوع بالا (کارت‌های تصویری و سوالات)
+        // ============================================
+        const captchaQuestions = [
+            { type: 'emoji', question: 'Select the 🐱', options: ['🐶', '🐱', '🐭', '🐹', '🐰'], answer: '🐱' },
+            { type: 'emoji', question: 'Select the 🌟', options: ['⭐', '🌟', '✨', '💫', '⚡'], answer: '🌟' },
+            { type: 'emoji', question: 'Select the 🚀', options: ['🚗', '🚕', '🚙', '🚀', '✈️'], answer: '🚀' },
+            { type: 'emoji', question: 'Select the ❤️', options: ['💙', '💚', '❤️', '💜', '🧡'], answer: '❤️' },
+            { type: 'emoji', question: 'Select the 🎮', options: ['🎯', '🎲', '🎮', '🎰', '🎳'], answer: '🎮' },
+            { type: 'color', question: 'Select the BLUE color', options: ['🔴 Red', '🔵 Blue', '🟢 Green', '🟡 Yellow', '🟣 Purple'], answer: '🔵 Blue' },
+            { type: 'color', question: 'Select the GREEN color', options: ['🔴 Red', '🔵 Blue', '🟢 Green', '🟡 Yellow', '⚫ Black'], answer: '🟢 Green' },
+            { type: 'direction', question: 'Select the RIGHT arrow', options: ['⬅️ Left', '➡️ Right', '⬆️ Up', '⬇️ Down', '↪️ Return'], answer: '➡️ Right' },
+            { type: 'direction', question: 'Select the UP arrow', options: ['⬅️ Left', '➡️ Right', '⬆️ Up', '⬇️ Down', '↩️ Back'], answer: '⬆️ Up' },
+            { type: 'animal', question: 'Select the DOG', options: ['🐱 Cat', '🐶 Dog', '🐭 Mouse', '🐹 Hamster', '🐰 Rabbit'], answer: '🐶 Dog' },
+            { type: 'animal', question: 'Select the ELEPHANT', options: ['🐘 Elephant', '🦒 Giraffe', '🦁 Lion', '🐒 Monkey', '🦓 Zebra'], answer: '🐘 Elephant' },
+            { type: 'fruit', question: 'Select the APPLE', options: ['🍎 Apple', '🍊 Orange', '🍌 Banana', '🍇 Grape', '🍒 Cherry'], answer: '🍎 Apple' },
+            { type: 'fruit', question: 'Select the WATERMELON', options: ['🍉 Watermelon', '🍓 Strawberry', '🥝 Kiwi', '🍑 Peach', '🍍 Pineapple'], answer: '🍉 Watermelon' },
+            { type: 'shape', question: 'Select the CIRCLE', options: ['⬜ Square', '🔴 Circle', '🔺 Triangle', '⭐ Star', '💎 Diamond'], answer: '🔴 Circle' },
+            { type: 'shape', question: 'Select the STAR', options: ['⬜ Square', '🔴 Circle', '🔺 Triangle', '⭐ Star', '💎 Diamond'], answer: '⭐ Star' }
+        ];
+        
+        let currentCaptchaData = null;
+        let captchaResolved = false;
+        
+        function generateRichCaptcha(containerId, onSuccess) {
+            captchaResolved = false;
+            const randomIndex = Math.floor(Math.random() * captchaQuestions.length);
+            currentCaptchaData = { ...captchaQuestions[randomIndex] };
+            
+            const captchaDiv = document.createElement('div');
+            captchaDiv.className = 'captcha-container';
+            
+            let optionsHtml = '<div class="captcha-cards-grid">';
+            currentCaptchaData.options.forEach(opt => {
+                optionsHtml += `<div class="captcha-card" data-value="${opt.replace(/[<>]/g, '')}">
+                    <div class="captcha-emoji">${opt.substring(0, 3)}</div>
+                    <div class="captcha-text">${opt}</div>
+                </div>`;
+            });
+            optionsHtml += '</div>';
+            
+            captchaDiv.innerHTML = `
+                <div style="margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 0.75rem; font-weight: 600;">🤖 ${currentCaptchaData.question}</span>
+                    <span class="captcha-question" style="font-size: 0.7rem;">⬅️ Click on correct</span>
+                </div>
+                ${optionsHtml}
+                <div id="captchaStatus" style="font-size: 0.7rem; margin-top: 0.5rem; color: #ff9800;">⚠️ Please select the correct option</div>
+            `;
+            
+            const container = document.getElementById(containerId);
+            if (container) {
+                container.innerHTML = '';
+                container.appendChild(captchaDiv);
+            }
+            
+            const cards = captchaDiv.querySelectorAll('.captcha-card');
+            cards.forEach(card => {
+                card.addEventListener('click', () => {
+                    const selectedValue = card.getAttribute('data-value');
+                    const statusDiv = captchaDiv.querySelector('#captchaStatus');
+                    
+                    if (selectedValue === currentCaptchaData.answer) {
+                        cards.forEach(c => c.classList.remove('selected', 'wrong'));
+                        card.classList.add('selected');
+                        if (statusDiv) {
+                            statusDiv.innerHTML = '✅ Verified successfully!';
+                            statusDiv.style.color = '#00c853';
+                        }
+                        if (!captchaResolved) {
+                            captchaResolved = true;
+                            if (onSuccess) onSuccess();
+                        }
+                    } else {
+                        card.classList.add('wrong');
+                        if (statusDiv) {
+                            statusDiv.innerHTML = '❌ Wrong selection, try again!';
+                            statusDiv.style.color = '#ff5252';
+                        }
+                        setTimeout(() => {
+                            card.classList.remove('wrong');
+                            if (statusDiv && !captchaResolved) {
+                                statusDiv.innerHTML = '⚠️ Please select the correct option';
+                                statusDiv.style.color = '#ff9800';
+                            }
+                        }, 800);
+                    }
+                });
+            });
+        }
+        
+        function isCaptchaResolved() { return captchaResolved; }
+
+        // ============================================
         // بقیه کدهای سایت
         // ============================================
         function addRipple(e, el) {
@@ -943,6 +1083,7 @@
             else if (page === 'team') { renderTeamPage(); showHomeButton(true); }
             else if (page === 'donate') { renderDonatePage(); showHomeButton(true); }
             else if (page === 'admin') { renderAdminGatePage(); showHomeButton(true); }
+            else if (page === 'ai') { window.open('https://chat.deepseek.com', '_blank'); showHomeButton(false); }
         }
         
         function renderHomePage() {
@@ -995,6 +1136,8 @@
 
         function renderAdminDashboard() {
             let dataPoints = [120, 340, 520, 280, 590, 410, 330];
+            const totalAccounts = users.length;
+            
             function getColorByValue(val) {
                 if (val < 200) return "#00c853";
                 if (val < 400) return "#5f8bff";
@@ -1017,7 +1160,23 @@
                 document.getElementById('currentViewsSpan').innerText = values[values.length-1];
             }
             function randomizeChart() { dataPoints = dataPoints.map(() => Math.floor(Math.random() * 591) + 10); drawChart(dataPoints); }
-            contentDiv.innerHTML = `<div style="max-width: 950px; margin: 2rem auto;"><div style="background: var(--card-light); backdrop-filter: blur(24px); border-radius: 2rem; padding: 2rem;"><h2>📊 Live Analytics</h2><p>Daily visits · <strong id="currentViewsSpan">--</strong> views today</p><div id="liveChartArea"></div><div id="updateTimer">Refreshing in <span id="countdownSec">30</span> seconds</div></div></div>`;
+            
+            contentDiv.innerHTML = `
+                <div style="max-width: 950px; margin: 2rem auto;">
+                    <div style="background: var(--card-light); backdrop-filter: blur(24px); border-radius: 2rem; padding: 2rem;">
+                        <!-- Stats Accounts Section -->
+                        <div class="stats-dashboard">
+                            <div class="stats-number">${totalAccounts}</div>
+                            <div class="stats-label">Total Registered Accounts</div>
+                            <div style="margin-top: 0.5rem; font-size: 0.7rem; opacity: 0.6;">✨ Active members in Nexus Ecosystem</div>
+                        </div>
+                        <h2>📊 Live Analytics</h2>
+                        <p>Daily visits · <strong id="currentViewsSpan">--</strong> views today</p>
+                        <div id="liveChartArea"></div>
+                        <div id="updateTimer">Refreshing in <span id="countdownSec">30</span> seconds</div>
+                    </div>
+                </div>
+            `;
             drawChart(dataPoints);
             let secs = 30;
             const timerSpan = document.getElementById('countdownSec');
@@ -1030,10 +1189,6 @@
         }
         
         homeBtn?.addEventListener('click', (e) => { e.stopPropagation(); if (adminInterval) { clearInterval(adminInterval); adminInterval = null; } navigateTo('home'); showToast("🏠 Returned to Nexus Home"); });
-        
-        let currentCaptchaSolution = null;
-        function generateCaptcha() { const types = ['sum', 'click']; const chosen = types[Math.floor(Math.random() * types.length)]; if (chosen === 'sum') { const a = Math.floor(Math.random() * 15) + 2; const b = Math.floor(Math.random() * 15) + 2; currentCaptchaSolution = a + b; return { html: `<div class="captcha-puzzle"><span class="captcha-question">🔐 ${a} + ${b} = ?</span><input type="text" id="captchaInput" class="captcha-input" placeholder="Answer"><button id="captchaVerifyBtn" class="captcha-btn">Verify</button></div>`, validator: (val) => parseInt(val) === currentCaptchaSolution }; } else { currentCaptchaSolution = 'clicked'; return { html: `<div class="captcha-puzzle"><span class="captcha-question">🖱️ Click to verify</span><button id="captchaClickBtn" class="captcha-btn">I'm not a robot 👆</button></div>`, validator: (val) => val === 'clicked' }; } }
-        function renderCaptcha(containerId, onSuccess) { const captchaData = generateCaptcha(); const captchaDiv = document.createElement('div'); captchaDiv.className = 'captcha-container'; captchaDiv.innerHTML = `<div style="margin-bottom: 0.3rem; font-size: 0.75rem;">🤖 <span style="font-weight: 600;">Verification</span></div>${captchaData.html}<div id="captchaStatus" style="font-size: 0.7rem; margin-top: 0.5rem; color: #f9a825;">⚠️ Please verify</div>`; const container = document.getElementById(containerId); if (container) { container.innerHTML = ''; container.appendChild(captchaDiv); } let resolved = false; const setValid = () => { if (!resolved) { resolved = true; const statusDiv = captchaDiv.querySelector('#captchaStatus'); if (statusDiv) { statusDiv.innerHTML = '✅ Verified successfully'; statusDiv.style.color = '#00c853'; } if (onSuccess) onSuccess(); } }; if (currentCaptchaSolution === 'clicked') { captchaDiv.querySelector('#captchaClickBtn')?.addEventListener('click', () => setValid()); } else if (typeof currentCaptchaSolution === 'number') { captchaDiv.querySelector('#captchaVerifyBtn')?.addEventListener('click', () => { const input = captchaDiv.querySelector('#captchaInput'); if (input && parseInt(input.value) === currentCaptchaSolution) setValid(); else { const st = captchaDiv.querySelector('#captchaStatus'); if (st) st.innerHTML = '❌ Wrong answer'; } }); } }
         
         function updateHeaderAvatar() { const img = document.getElementById('profileAvatarImg'); const placeholder = document.getElementById('avatarPlaceholder'); if (currentUser?.avatar) { img.src = currentUser.avatar; img.style.display = 'block'; placeholder.style.display = 'none'; } else { img.style.display = 'none'; placeholder.style.display = 'flex'; placeholder.textContent = currentUser?.username?.charAt(0) || '👤'; } }
         
@@ -1052,10 +1207,9 @@
                 function renderAuth() { 
                     if (view === 'signin') { 
                         container.innerHTML = `<h3>Welcome back</h3><div class="account-form" id="signinForm"><div class="input-group"><label>Email or Mobile</label><input id="loginId" class="account-input"></div><div class="input-group"><label>Password</label><input id="loginPwd" type="password" class="account-input"></div><div id="captchaAnchorSignin"></div><button class="btn-account" id="doLogin">Sign In →</button><button class="toggle-auth" id="toSignup">✨ No account? Create</button><button class="toggle-auth" id="toRecover">🔐 Forgot password?</button></div>`; 
-                        let captchaOk = false; 
-                        renderCaptcha('captchaAnchorSignin', () => captchaOk = true); 
+                        generateRichCaptcha('captchaAnchorSignin', () => {}); 
                         document.getElementById('doLogin')?.addEventListener('click', async () => { 
-                            if (!captchaOk) { showToast("Complete CAPTCHA first"); return; } 
+                            if (!isCaptchaResolved()) { showToast("Complete CAPTCHA first"); return; } 
                             const id = document.getElementById('loginId').value.trim(); 
                             const pwd = document.getElementById('loginPwd').value; 
                             const user = users.find(u => (u.email === id || u.mobile === id) && u.password === pwd); 
@@ -1072,11 +1226,10 @@
                         document.getElementById('toRecover')?.addEventListener('click', () => { view = 'recover'; renderAuth(); }); 
                     } else if (view === 'signup') { 
                         container.innerHTML = `<h3>Create account</h3><div class="account-form" id="signupForm"><div class="input-group"><label>Username (3-20)</label><input id="suName" class="account-input"></div><div class="input-group"><label>Mobile</label><input id="suMobile" class="account-input"></div><div class="input-group"><label>Email</label><input id="suEmail" class="account-input"></div><div class="input-group"><label>Password (min 5)</label><input id="suPwd" type="password" class="account-input"></div><div id="captchaAnchorSignup"></div><button class="btn-account" id="doSignup">Create →</button><button class="toggle-auth" id="backSignin">← Back</button></div>`; 
-                        let captchaOk = false; 
-                        renderCaptcha('captchaAnchorSignup', () => captchaOk = true); 
+                        generateRichCaptcha('captchaAnchorSignup', () => {}); 
                         
                         document.getElementById('doSignup')?.addEventListener('click', async () => { 
-                            if (!captchaOk) { showToast("Complete CAPTCHA"); return; } 
+                            if (!isCaptchaResolved()) { showToast("Complete CAPTCHA"); return; } 
                             
                             const name = document.getElementById('suName').value.trim(); 
                             const mobile = document.getElementById('suMobile').value.trim(); 
@@ -1120,7 +1273,6 @@
                             loadingCheckmark.style.display = 'none';
                             loadingTitle.textContent = 'Creating Account';
                             
-                            // مرحله 1
                             setTimeout(() => {
                                 const step1Icon = document.getElementById('step1Icon');
                                 if (step1Icon) {
@@ -1129,7 +1281,6 @@
                                 }
                             }, 500);
                             
-                            // مرحله 2 - شروع ارسال ایمیل
                             setTimeout(() => {
                                 const step2Icon = document.getElementById('step2Icon');
                                 if (step2Icon) {
@@ -1138,17 +1289,14 @@
                                 }
                             }, 1200);
                             
-                            // ایجاد اکانت
                             const newUser = { username: name, mobile, email, password: pwd, id: Date.now().toString(), avatar: null }; 
                             users.push(newUser); 
                             saveUsers(); 
                             currentUser = newUser; 
                             saveCurrentUser(); 
                             
-                            // ارسال ایمیل
                             await sendRealEmail(currentUser.email, 'signup', currentUser.username);
                             
-                            // مرحله 2 - کامل شد
                             setTimeout(() => {
                                 const step2Icon = document.getElementById('step2Icon');
                                 if (step2Icon) {
@@ -1163,7 +1311,6 @@
                                 }
                             }, 1800);
                             
-                            // مرحله 3 - تکمیل
                             setTimeout(() => {
                                 const step3Icon = document.getElementById('step3Icon');
                                 if (step3Icon) {
@@ -1176,22 +1323,19 @@
                                 loadingTitle.textContent = 'Account Created Successfully!';
                             }, 2800);
                             
-                            // بستن انیمیشن بعد از 4 ثانیه
                             setTimeout(() => {
                                 loadingOverlay.classList.remove('active');
                                 renderAccountSidebar(); 
                                 closeAccountSidebar();
                                 showToast(`Welcome ${name}! ✨`);
                             }, 4000);
-                            // ========== پایان انیمیشن ==========
                         }); 
                         document.getElementById('backSignin')?.addEventListener('click', () => { view = 'signin'; renderAuth(); }); 
                     } else { 
                         container.innerHTML = `<h3>Reset Password</h3><div class="account-form"><div class="input-group"><label>Email/Mobile</label><input id="recId" class="account-input"></div><div class="input-group"><label>New Password</label><input id="newPwdRec" type="password" class="account-input"></div><div id="captchaAnchorRecover"></div><button class="btn-account" id="resetPwdBtn">Reset</button><button class="toggle-auth" id="backRec">← Back</button></div>`; 
-                        let captchaOk = false; 
-                        renderCaptcha('captchaAnchorRecover', () => captchaOk = true); 
+                        generateRichCaptcha('captchaAnchorRecover', () => {}); 
                         document.getElementById('resetPwdBtn')?.addEventListener('click', () => { 
-                            if (!captchaOk) { showToast("CAPTCHA required"); return; } 
+                            if (!isCaptchaResolved()) { showToast("CAPTCHA required"); return; } 
                             const idf = document.getElementById('recId').value.trim(); 
                             const newP = document.getElementById('newPwdRec').value; 
                             const found = users.find(u => u.email === idf || u.mobile === idf); 
@@ -1224,13 +1368,13 @@
         if (localStorage.getItem('dtl-theme') === 'dark') { body.classList.add('dark'); themeLabel.innerText = 'Dark'; }
         themeBtn?.addEventListener('click', () => { body.classList.toggle('dark'); localStorage.setItem('dtl-theme', body.classList.contains('dark') ? 'dark' : 'light'); themeLabel.innerText = body.classList.contains('dark') ? 'Dark' : 'Light'; });
         document.getElementById('teamActionBtn')?.addEventListener('click', () => { closeMenu(); navigateTo('team'); });
-        document.getElementById('aiActionBtn')?.addEventListener('click', () => showToast("🚀 AI Nexus · coming soon"));
+        document.getElementById('aiActionBtn')?.addEventListener('click', () => { closeMenu(); navigateTo('ai'); });
         document.getElementById('donateActionBtn')?.addEventListener('click', () => { closeMenu(); navigateTo('donate'); });
         document.getElementById('adminActionBtn')?.addEventListener('click', () => { closeMenu(); navigateTo('admin'); });
         document.querySelectorAll('.theme-toggle, .profile-avatar, .hamburger, .card-item, .menu-action-btn, .close-btn, .btn-account, .toggle-auth').forEach(attachRipple);
         navigateTo('home');
         
-        console.log('🚀 Site loaded with EmailJS and Animation');
+        console.log('🚀 Site loaded with Rich CAPTCHA and Admin Stats');
     </script>
 </body>
 </html>
